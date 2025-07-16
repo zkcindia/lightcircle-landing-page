@@ -9,11 +9,12 @@ import {
   Search,
   ShoppingCart,
 } from "lucide-react";
-import { useRouter } from "next/navigation"; // ✅ Import useRouter for navigation
+import { usePathname, useRouter } from "next/navigation"; // ✅ Import useRouter for navigation
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
+   const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,10 +25,21 @@ export default function Header() {
   }, []);
 
   const handleScrollTo = (id) => {
-    if (id === "contact-page") {
-      router.push("/contact"); // ✅ Navigate to /contact
+   const targetId = id;
+
+    // If on a different page, navigate back to "/" and pass target id as query
+    if (
+      (pathname === "/contact" || pathname === "/aboutus"||pathname === "/login") &&
+      id !== "about-section" &&
+      id !== "contact-page"
+    ) {
+      router.push(`/?scrollTo=${id}`);
+    } else if (id === "contact-page") {
+      router.push("/contact");
+    } else if (id === "about-section") {
+      router.push("/aboutus");
     } else {
-      const section = document.getElementById(id);
+      const section = document.getElementById(targetId);
       if (section) {
         section.scrollIntoView({ behavior: "smooth" });
       } else if (id === "home-section") {
@@ -68,9 +80,14 @@ export default function Header() {
 
       {/* Logo + Navbar */}
       <div
-        className={`relative z-10 transition-colors duration-500 ${
-          isScrolled ? "bg-white shadow-md" : "bg-transparent"
+        className={`relative z-10 transition duration-500 ${
+          !isScrolled && "bg-transparent"
         }`}
+        style={{
+    backgroundImage: isScrolled ? "url('/images/z (2).png')" : "none",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}
       >
         <div className="flex justify-center items-center py-4">
           <h1 className="text-3xl font-bold uppercase tracking-wider text-black">
@@ -92,9 +109,9 @@ export default function Header() {
           </ul>
 
           <div className="flex gap-4 text-black ml-8">
-            <Truck className="cursor-pointer" />
-            <User className="cursor-pointer" />
-            <Search className="cursor-pointer" />
+            {/* <Truck className="cursor-pointer" /> */}
+            <User className="cursor-pointer" onClick={() => router.push("/login")} />
+            {/* <Search className="cursor-pointer" /> */}
             <ShoppingCart className="cursor-pointer" />
           </div>
         </nav>
@@ -102,3 +119,5 @@ export default function Header() {
     </header>
   );
 }
+
+

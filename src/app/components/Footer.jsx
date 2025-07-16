@@ -1,20 +1,31 @@
 "use client";
 
-import React from "react";
-import { FaFacebookF, FaTwitter, FaInstagram } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaFacebookF, FaInstagram } from "react-icons/fa";
 import Image from "next/image";
 
 export default function Footer() {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = () => {
+    if (email.trim() !== "") {
+      setSubscribed(true);
+      setEmail("");
+      // Optional: Here you can add your API call to actually handle the subscription
+    }
+  };
+
   return (
     <footer className="w-full bg-white text-gray-700 border-t border-gray-200 px-6 py-12">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Logo & Tagline */}
         <div>
-          <h2 className="text-2xl font-bold tracking-widest mb-2">VOYLITE</h2>
+          <h2 className="text-2xl font-bold tracking-widest mb-2">LIGHTCICLE</h2>
           <p className="text-sm mb-4">Lights for people who love great design</p>
           <div className="flex items-center gap-2 mb-4">
             <Image
-              src="/images/verified.png"
+              src="/images/Verified & Secured.jpeg"
               alt="Verified & Secured"
               width={120}
               height={30}
@@ -23,20 +34,33 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold mb-2">CONNECT</h3>
             <div className="flex gap-4">
-              <FaFacebookF className="text-blue-600" />
-              <FaTwitter className="text-blue-400" />
-              <FaInstagram className="text-pink-500" />
+              <a
+                href="https://www.facebook.com/LI8CIRCLE"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+              >
+                <FaFacebookF className="text-blue-600 cursor-pointer" />
+              </a>
+
+              <a
+                href="https://www.instagram.com/lightcircleee?igsh=cjJhcHJ5aWRqczBo"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+              >
+                <FaInstagram className="text-pink-500 cursor-pointer" />
+              </a>
             </div>
           </div>
         </div>
 
         {/* About Links */}
         <div>
-          <h3 className="text-sm font-semibold mb-4">MORE ABOUT VOYLITE</h3>
+          <h3 className="text-sm font-semibold mb-4">MORE ABOUT LIGHTCICLE</h3>
           <ul className="space-y-2 text-sm">
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Contact Us</a></li>
+            <li><a href="#" className="hover:underline cursor-pointer">About Us</a></li>
+            <li><a href="#" className="hover:underline cursor-pointer">Contact Us</a></li>
           </ul>
         </div>
 
@@ -46,34 +70,31 @@ export default function Footer() {
           <input
             type="email"
             placeholder="Enter your email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full border-b border-gray-400 mb-4 px-2 py-1 focus:outline-none"
           />
-          <div className="flex items-center gap-2 mb-4">
-            <Image
-              src="/images/captcha.png"
-              alt="Captcha"
-              width={100}
-              height={30}
-            />
-            <input
-              type="text"
-              placeholder="Enter Captcha"
-              className="flex-1 border-b border-gray-400 px-2 py-1 focus:outline-none"
-            />
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleSubscribe}
+              className="border border-gray-700 text-sm px-6 py-2 cursor-pointer rounded-full transition-all duration-300 hover:bg-gray-700 hover:text-white hover:shadow-md hover:scale-105"
+            >
+              SUBSCRIBE
+            </button>
+            {subscribed && (
+              <span className="text-green-600 font-medium">Thanks!</span>
+            )}
           </div>
-          <button className="border border-gray-700 text-sm px-4 py-1">
-            SUBSCRIBE
-          </button>
         </div>
 
         {/* Payment Partners */}
         <div>
           <h3 className="text-sm font-semibold mb-4">PAYMENT PARTNERS</h3>
           <div className="flex flex-wrap gap-4">
-            <Image src="/images/visa.png" alt="Visa" width={40} height={24} />
-            <Image src="/images/mastercard.png" alt="Mastercard" width={40} height={24} />
-            <Image src="/images/paytm.png" alt="Paytm" width={40} height={24} />
-            <Image src="/images/gpay.png" alt="Google Pay" width={40} height={24} />
+            <Image src="/images/VISA.png" alt="Visa" width={40} height={24} className="cursor-pointer" />
+            <Image src="/images/mastercard.png" alt="Mastercard" width={40} height={24} className="cursor-pointer" />
+            <Image src="/images/paytm.png" alt="Paytm" width={40} height={24} className="cursor-pointer" />
+            <Image src="/images/gpay.png" alt="Google Pay" width={40} height={24} className="cursor-pointer" />
           </div>
         </div>
       </div>
@@ -97,12 +118,12 @@ export default function Footer() {
         </p>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 border-t border-gray-300 pt-4">
           <div className="flex gap-4 text-xs">
-            <a href="#" className="hover:underline">Returns</a>
-            <a href="#" className="hover:underline">Terms of Use</a>
-            <a href="#" className="hover:underline">Privacy</a>
-            <a href="#" className="hover:underline">Intellectual Property</a>
+            <a href="#" className="hover:underline cursor-pointer">Returns</a>
+            <a href="#" className="hover:underline cursor-pointer">Terms of Use</a>
+            <a href="#" className="hover:underline cursor-pointer">Privacy</a>
+            <a href="#" className="hover:underline cursor-pointer">Intellectual Property</a>
           </div>
-          <div className="text-xs">&copy; All rights reserved by Voylite 2019</div>
+          <div className="text-xs">&copy; All rights reserved by lightcicle</div>
         </div>
       </div>
     </footer>
