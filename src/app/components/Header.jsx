@@ -58,9 +58,9 @@ export default function Header() {
       label: "SHOP BY TYPE",
       dropdown: [
         { label: "LIGHTS", id: "allproduct" },
-        { label: "FANS" },
-        { label: "HOME DECOR" },
-        { label: "NAME PLATES" },
+        { label: "FANS", id: "allproduct"}, 
+        { label: "HOME DECOR",id: "allproduct" },
+        { label: "NAME PLATES",id: "allproduct" },
       ],
     },
     {
