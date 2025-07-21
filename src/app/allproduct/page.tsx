@@ -5,8 +5,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function AllProductPage() {
-  const router = useRouter()
-  // 40 light products
+  const router = useRouter();
+
   const lightProducts = Array.from({ length: 40 }, (_, i) => ({
     id: `light-${i + 1}`,
     name: `Light Product ${i + 1}`,
@@ -15,7 +15,6 @@ export default function AllProductPage() {
     image: `/images/light/${i + 1}.jpeg`,
   }));
 
-  // 40 fan products
   const fanProducts = Array.from({ length: 40 }, (_, i) => ({
     id: `fan-${i + 1}`,
     name: `Fan Product ${i + 1}`,
@@ -24,7 +23,6 @@ export default function AllProductPage() {
     image: `/images/light/${i + 41}.jpeg`,
   }));
 
-  // 40 Home Decor products (81 to 120)
   const homeDecorProducts = Array.from({ length: 40 }, (_, i) => ({
     id: `decor-${81 + i}`,
     name: `Home Decor Product ${81 + i}`,
@@ -33,7 +31,6 @@ export default function AllProductPage() {
     image: `/images/light/${81 + i}.jpeg`,
   }));
 
-  // 40 Name Plate products (121 to 160)
   const namePlateProducts = Array.from({ length: 40 }, (_, i) => ({
     id: `nameplate-${121 + i}`,
     name: `Name Plate ${121 + i}`,
@@ -43,18 +40,39 @@ export default function AllProductPage() {
   }));
 
   const filters = [
-    "AVAILABILITY",
-    "PRICE",
-    "APPLICATION LOCATION",
-    "BODY COLOR",
-    "COUNTRY OF ORIGIN",
-    "DIAMETER",
-    "LENGTH",
+    {
+      label: "AVAILABILITY",
+      options: ["In Stock", "Out of Stock", "Pre-Order"],
+    },
+    {
+      label: "PRICE",
+      options: ["Under ₹5000", "₹5000 - ₹10000", "₹10000 & Above"],
+    },
+    {
+      label: "APPLICATION LOCATION",
+      options: ["Indoor", "Outdoor", "Bathroom", "Kitchen"],
+    },
+    {
+      label: "BODY COLOR",
+      options: ["White", "Black", "Gold", "Silver", "Brown"],
+    },
+    {
+      label: "COUNTRY OF ORIGIN",
+      options: ["India", "China", "Germany", "USA"],
+    },
+    {
+      label: "DIAMETER",
+      options: ["Under 12 inches", "12-24 inches", "24 inches & Above"],
+    },
+    {
+      label: "LENGTH",
+      options: ["Under 2 feet", "2-4 feet", "4 feet & Above"],
+    },
   ];
 
   return (
     <main className="max-w-7xl mx-auto px-4 pb-16 gap-8 relative pt-[140px]">
-      {/* PRODUCTS Heading with underline */}
+      {/* PRODUCTS Heading */}
       <div className="fixed top-34 w-full border-b border-gray-300 z-30 bg-white">
         <h1 className="text-xs tracking-wide text-center py-2">PRODUCTS</h1>
       </div>
@@ -63,16 +81,23 @@ export default function AllProductPage() {
         {/* Sidebar */}
         <aside className="hidden md:block w-64 pr-4 sticky top-[140px] h-[calc(100vh-140px)] overflow-y-auto">
           {filters.map((filter) => (
-            <details key={filter} className="mb-4">
+            <details key={filter.label} className="mb-4">
               <summary className="cursor-pointer font-medium pb-2 text-sm border-b border-gray-300">
-                {filter}
+                {filter.label}
               </summary>
-              <div className="mt-2 text-xs text-gray-500">(Filter options)</div>
+              <div className="mt-2 text-xs text-gray-700 space-y-1">
+                {filter.options.map((option) => (
+                  <div key={option} className="flex items-center gap-2">
+                    <input type="checkbox" id={option} className="h-3 w-3" />
+                    <label htmlFor={option}>{option}</label>
+                  </div>
+                ))}
+              </div>
             </details>
           ))}
         </aside>
 
-        {/* Product Sections */}
+        {/* Products */}
         <section className="flex-1 pr-2 space-y-16">
           {/* Lights */}
           <div>
@@ -82,7 +107,7 @@ export default function AllProductPage() {
                 <div
                   key={p.id}
                   className="p-4 relative hover:shadow transition rounded-md cursor-pointer group"
-                  onClick={()=>router.push(`/allproduct/${p.name}`)}
+                  onClick={() => router.push(`/allproduct/${p.name}`)}
                 >
                   <div className="overflow-hidden rounded">
                     <Image

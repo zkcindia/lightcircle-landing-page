@@ -38,7 +38,7 @@ export default function Header() {
     } else if (id === "about-section") {
       router.push("/aboutus");
     } else if (id === "blog-page") {
-      router.push("/blog");
+      router.push("/blogs");
     } else if (id === "allproduct") {
       router.push("/allproduct");
     } else {
@@ -230,7 +230,7 @@ export default function Header() {
           {/* Right icons + mobile toggle */}
           <div className="flex items-center gap-4 text-black">
             <User className="cursor-pointer" onClick={() => router.push("/login")} />
-            <ShoppingCart className="cursor-pointer" />
+            {/* <ShoppingCart className="cursor-pointer" /> */}
             <Menu
               className="block md:hidden cursor-pointer"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
