@@ -1,11 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import {handleLogin} from './../../service/apiAuth'
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
+  const router = useRouter()
   const [isSigningIn, setIsSigningIn] = useState(true);
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
+  const [username,setUserName]=useState('');
+  const [password,setPassword] = useState('')
 
   const toggleMode = (e:any) => {
     e.preventDefault();
@@ -14,14 +19,30 @@ export default function SignupPage() {
     setAgreed(false);
   };
 
-  const handleSubmit = (e:any) => {
+  const handleSubmit = async(e:any) => {
     e.preventDefault();
-    if (!isSigningIn && !agreed) {
-      setError("You must agree to the terms of service.");
-      return;
+    try {
+      if (!isSigningIn && !agreed) {
+        setError("You must agree to the terms of service.");
+        return;
+      }
+      const data ={
+        email:username,
+        password:password
+      }
+      const response = await handleLogin(data);
+      if(response.status){
+         localStorage.setItem("token", response.data);
+        router.push('/admin')
+      }
+    } catch (error) {
+      console.log(error);
+      
+    }finally{
+      setError("");
+
     }
-    setError("");
-    alert(isSigningIn ? "Signing in..." : "Account created!");
+    // alert(isSigningIn ? "Signing in..." : "Account created!");
   };
 
   return (
@@ -41,6 +62,7 @@ export default function SignupPage() {
                 </label>
                 <input
                   type="text"
+                  
                   placeholder="Your Name"
                   className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black text-black"
                 />
@@ -53,6 +75,8 @@ export default function SignupPage() {
               </label>
               <input
                 type="email"
+                value={username}
+                onChange={(e)=>setUserName(e.target.value)}
                 placeholder="you@example.com"
                 className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black text-black"
               />
@@ -64,6 +88,8 @@ export default function SignupPage() {
               </label>
               <input
                 type="password"
+                value={password}
+                  onChange={(e)=>setPassword(e.target.value)}
                 placeholder="6+ characters"
                 className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black text-black"
               />

@@ -1,7 +1,15 @@
-import React from 'react'
+"use client";
 
-export default function AdminFooter() {
+import React from "react";
+import { Heart } from "lucide-react";
+
+export default function Footer() {
   return (
-    <div>AdminFooter</div>
-  )
+    <footer className="w-full py-4 bg-[#f9f7f7] flex justify-center border-t border-gray-200">
+      <p className="text-[#677294] text-sm flex items-center gap-1">
+        2023 © All rights reserved by ZKC India Pvt Ltd.
+
+      </p>
+    </footer>
+  );
 }

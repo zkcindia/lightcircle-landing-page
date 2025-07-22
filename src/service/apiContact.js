@@ -8,3 +8,4 @@ export const saveContactUs =async(data)=>{
     const res = await axios.post(`${URL}/contact/`,data);
     return res;
 }
+
