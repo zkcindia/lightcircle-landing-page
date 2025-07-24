@@ -22,7 +22,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
-export default function SideBar(props) {
+export default function SideBar(props:any) {
   // If props exist, use controlled mode. Otherwise fallback to internal state.
   const isControlled = props.collapsed !== undefined && props.setCollapsed !== undefined;
 
