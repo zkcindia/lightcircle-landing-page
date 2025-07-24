@@ -3,6 +3,7 @@
 import React from 'react';
 import { Pencil, Trash2, Star } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const products = [
   {
@@ -118,13 +119,18 @@ const products = [
 ];
 
 export default function ProductPage() {
+  const router = useRouter();
+
   return (
     <section className="p-6 bg-[#f9f7f7] min-h-screen">
       <div className="bg-white rounded-xl shadow px-6 py-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">All Product List</h2>
           <div className="flex gap-2">
-            <button className="bg-[#ff5d2c] hover:bg-[#ff3d00] text-white px-4 py-2 rounded-md font-medium">
+            <button
+              onClick={() => router.push('/admin/create')}
+              className="bg-[#ff5d2c] hover:bg-[#ff3d00] text-white px-4 py-2 rounded-md font-medium"
+            >
               Add Product
             </button>
             <button className="border px-4 py-2 rounded-md text-gray-600">
@@ -138,7 +144,9 @@ export default function ProductPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="text-sm font-semibold text-gray-600 border-b">
-                <th className="py-3"><input type="checkbox" /></th>
+                <th className="py-3">
+                  <input type="checkbox" />
+                </th>
                 <th className="py-3">Product Name & Size</th>
                 <th className="py-3">Price</th>
                 <th className="py-3">Stock</th>
