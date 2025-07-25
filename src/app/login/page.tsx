@@ -32,7 +32,7 @@ export default function SignupPage() {
       }
       const response = await handleLogin(data);
       if(response.status){
-         localStorage.setItem("token", response.data);
+         localStorage.setItem("token", JSON.stringify(response.data));
         router.push('/admin')
       }
     } catch (error) {
