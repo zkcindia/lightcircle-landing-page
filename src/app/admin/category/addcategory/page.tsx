@@ -22,12 +22,12 @@ export default function CreateCategoryPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const searchParams = useSearchParams();
-  const id = searchParams.get('id');
+  const data = searchParams.get('data');
   const router = useRouter();
 
   // If editing, fetch category details using GET API.
   useEffect(() => {
-    if (id) {
+    if (data) {
       async function fetchCategoryData() {
         try {
           const data = await getCategory(id);
@@ -50,7 +50,7 @@ export default function CreateCategoryPage() {
       }
       fetchCategoryData();
     }
-  }, [id]);
+  }, [data]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -115,7 +115,7 @@ export default function CreateCategoryPage() {
   return (
     <div className="p-8 bg-[#f9f7f7] min-h-screen space-y-8">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">
-        {id ? 'Edit Category' : 'Create Category'}
+        {data ? 'Edit Category' : 'Create Category'}
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -133,7 +133,7 @@ export default function CreateCategoryPage() {
           <div className="mt-4 space-y-2 text-sm text-gray-600">
             <div className="flex justify-between">
               <span className="font-semibold">Created By :</span>
-              <span className="text-blue-500">{formData.created_by || 'Seller'}</span>
+              <span className="text-blue-500">{formData.created_by || data?.created_by}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-semibold">Stock :</span>
@@ -141,7 +141,7 @@ export default function CreateCategoryPage() {
             </div>
             <div className="flex justify-between">
               <span className="font-semibold">ID :</span>
-              <span className="text-blue-600">{formData.tagId || 'FS16276'}</span>
+              <span className="text-blue-600">{formData.tagId || ''}</span>
             </div>
           </div>
           <div className="mt-6 flex gap-4">
@@ -149,7 +149,7 @@ export default function CreateCategoryPage() {
               onClick={handleSave}
               className="flex-1 border border-orange-500 text-orange-500 rounded-lg py-2 hover:bg-orange-50 cursor-pointer"
             >
-              {id ? 'Update Category' : 'Create Category'}
+              {data ? 'Update Category' : 'Create Category'}
             </button>
             <button
               onClick={handleCancel}
@@ -266,7 +266,7 @@ export default function CreateCategoryPage() {
           className="border px-6 py-2 rounded-md border-gray-300 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
         >
           {loading && <LoaderCircle className="animate-spin" size={16} />}
-          {loading ? 'Saving...' : id ? 'Update Changes' : 'Save Change'}
+          {loading ? 'Saving...' : data ? 'Update Changes' : 'Save Change'}
         </button>
         <button
           onClick={handleCancel}
