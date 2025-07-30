@@ -3,9 +3,9 @@
 import React from "react";
 import { Moon, Bell, Settings, Clock, Search } from "lucide-react";
 
-export default function AdminHeader() {
+export default function AdminHeader({collapsed}: {collapsed: boolean}) {
   return (
-    <header className="w-full flex justify-between items-center px-8 py-4 bg-[#f9f7f7] border-b border-gray-200">
+    <header className={`w-full flex justify-between items-center px-8 py-4 bg-[#f9f7f7] border-b border-gray-200 `}>
       {/* Left Section */}
       <h1 className="text-[#677294] text-lg font-semibold uppercase tracking-wide">
         Welcome!
