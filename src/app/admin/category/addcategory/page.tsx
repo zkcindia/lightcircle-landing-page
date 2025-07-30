@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Upload, LoaderCircle, CheckCircle2 } from 'lucide-react';
-import { saveCategory } from '@/service/apiCategory';
+import { saveCategory, getCategory } from '@/service/apiCategory';
 
 export default function CreateCategoryPage() {
   const [formData, setFormData] = useState({
@@ -15,11 +16,41 @@ export default function CreateCategoryPage() {
     metaKeyword: '',
     metaDescription: '',
   });
-
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
+  const router = useRouter();
+
+  // If editing, fetch category details using GET API.
+  useEffect(() => {
+    if (id) {
+      async function fetchCategoryData() {
+        try {
+          const data = await getCategory(id);
+          setFormData({
+            name: data.name || '',
+            created_by: data.created_by || '',
+            stock: data.stock || '',
+            tagId: data.tagId || '',
+            description: data.description || '',
+            metaTitle: data.metaTitle || '',
+            metaKeyword: data.metaKeyword || '',
+            metaDescription: data.metaDescription || '',
+          });
+          if (data.thumbnail) {
+            setThumbnailUrl(data.thumbnail);
+          }
+        } catch (error) {
+          console.error('Error fetching category data:', error);
+        }
+      }
+      fetchCategoryData();
+    }
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -32,11 +63,14 @@ export default function CreateCategoryPage() {
     setLoading(true);
     setSuccessMessage('');
     try {
+      // Here, we are reusing saveCategory for creation.
+      // (For edit, you might want to call an update API instead.)
       const res = await saveCategory(formData);
-      console.log('Category created:', res.data);
+      console.log('Category saved:', res.data);
       setSuccessMessage('Category saved successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
-      handleCancel();
+      // Optionally, navigate back to the category list page.
+      router.push('/admin/category');
     } catch (error) {
       console.error('Error saving category:', error);
       alert('Failed to save category');
@@ -80,7 +114,9 @@ export default function CreateCategoryPage() {
 
   return (
     <div className="p-8 bg-[#f9f7f7] min-h-screen space-y-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Create Category</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-4">
+        {id ? 'Edit Category' : 'Create Category'}
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="bg-white p-6 rounded-xl shadow-md col-span-1">
@@ -92,7 +128,7 @@ export default function CreateCategoryPage() {
             />
           </div>
           <h2 className="text-sm font-semibold text-center text-gray-700">
-            Fashion Men , Women & Kid's
+            Fashion Men, Women & Kid's
           </h2>
           <div className="mt-4 space-y-2 text-sm text-gray-600">
             <div className="flex justify-between">
@@ -113,7 +149,7 @@ export default function CreateCategoryPage() {
               onClick={handleSave}
               className="flex-1 border border-orange-500 text-orange-500 rounded-lg py-2 hover:bg-orange-50 cursor-pointer"
             >
-              Create Category
+              {id ? 'Update Category' : 'Create Category'}
             </button>
             <button
               onClick={handleCancel}
@@ -230,7 +266,7 @@ export default function CreateCategoryPage() {
           className="border px-6 py-2 rounded-md border-gray-300 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
         >
           {loading && <LoaderCircle className="animate-spin" size={16} />}
-          {loading ? 'Saving...' : 'Save Change'}
+          {loading ? 'Saving...' : id ? 'Update Changes' : 'Save Change'}
         </button>
         <button
           onClick={handleCancel}
@@ -242,3 +278,4 @@ export default function CreateCategoryPage() {
     </div>
   );
 }
+

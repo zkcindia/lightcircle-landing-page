@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { getCategory, deleteCategory } from '@/service/apiCategory';
 
 const cards = [
   {
@@ -28,84 +29,47 @@ const cards = [
   },
 ];
 
-const categoryRows = [
-  {
-    image: '/images/product/tshirt.webp',
-    name: "Fashion Men, Women & Kid's",
-    price: '$80 to $400',
-    creator: 'Seller',
-    id: 'FS16276',
-    stock: 46233,
-  },
-  {
-    image: '/images/product/bag.jpg',
-    name: 'Women Hand Bag',
-    price: '$120 to $500',
-    creator: 'Admin',
-    id: 'HB73029',
-    stock: 2739,
-  },
-  {
-    image: '/images/product/cap.webp',
-    name: 'Cap and Hat',
-    price: '$50 to $200',
-    creator: 'Admin',
-    id: 'CH492-9',
-    stock: 1829,
-  },
-  {
-    image: '/images/product/33.png',
-    name: 'Electronics Headphone',
-    price: '$100 to $700',
-    creator: 'Seller',
-    id: 'EC23818',
-    stock: 1902,
-  },
-  {
-    image: '/images/product/shoe.webp',
-    name: 'Foot Wares',
-    price: '$70 to $400',
-    creator: 'Seller',
-    id: 'FW11009',
-    stock: 2733,
-  },
-  {
-    image: '/images/product/wallet.png',
-    name: 'Wallet Categories',
-    price: '$120 to $300',
-    creator: 'Admin',
-    id: 'WL38299',
-    stock: 890,
-  },
-  {
-    image: '/images/product/w.jpg',
-    name: 'Electronics Watch',
-    price: '$60 to $400',
-    creator: 'Seller',
-    id: 'SM37817',
-    stock: 250,
-  },
-  {
-    image: '/images/product/glass.jpg',
-    name: 'Eye Ware & Sunglass',
-    price: '$70 to $500',
-    creator: 'Admin',
-    id: 'EG37878',
-    stock: 1900,
-  },
-];
-
 export default function CategoryPage() {
   const router = useRouter();
+  const [categoryRows, setCategoryRows] = useState([]);
 
-  const getMonthOptions = () => {
-    return [
-      { label: 'This Month', value: 'this_month' },
-      { label: 'Download', value: 'Download' },
-      { label: 'Export', value: 'Export' },
-      { label: 'Import', value: 'Import' },
-    ];
+  useEffect(() => {
+    fetchCategory();
+  }, []);
+
+  const fetchCategory = async () => {
+    try {
+      const responce = await getCategory();
+      console.log(responce);
+
+      if (responce.status === 200) {
+        setCategoryRows(responce.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const handleDelete = async (id) => {
+    try {
+      const confirmDelete = window.confirm('Are you sure you want to delete this category?');
+      if (!confirmDelete) return;
+
+      const response = await deleteCategory(id);
+      if (response.status === 204) {
+        setCategoryRows((prev) => prev.filter((item) => item.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting category:', error);
+    }
+  };
+
+  const getMonthOptions = () => [
+    { label: 'This Month', value: 'this_month' },
+    { label: 'Download', value: 'Download' },
+    { label: 'Export', value: 'Export' },
+    { label: 'Import', value: 'Import' },
+  ];
 
   return (
     <main className="min-h-screen p-8 bg-gray-50 cursor-crosshair">
@@ -157,8 +121,7 @@ export default function CategoryPage() {
                   <input type="checkbox" />
                 </th>
                 <th className="px-4 py-2">Categories</th>
-                <th className="px-4 py-2">Starting Price</th>
-                <th className="px-4 py-2">Create by</th>
+                <th className="px-4 py-2">Created by</th>
                 <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2">Product Stock</th>
                 <th className="px-4 py-2">Action</th>
@@ -171,18 +134,26 @@ export default function CategoryPage() {
                     <input type="checkbox" />
                   </td>
                   <td className="px-4 py-2 flex items-center gap-2">
-                    <Image src={row.image} alt={row.name} width={40} height={40} />
+                    <img src={row.image ? row.image : '/images/product/noproduct.webp'} alt={row.name} width={40} height={40} />
                     {row.name}
                   </td>
-                  <td className="px-4 py-2">{row.price}</td>
-                  <td className="px-4 py-2">{row.creator}</td>
+                  <td className="px-4 py-2">{row.created_by}</td>
                   <td className="px-4 py-2">{row.id}</td>
-                  <td className="px-4 py-2">{row.stock}</td>
+                  <td className="px-4 py-2">{row.quantity || 0}</td>
                   <td className="px-4 py-2 flex gap-2">
                     <div className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
+                      <Eye className="w-4 h-4 text-[#ff5d2c]" />
+                    </div>
+                    <div
+                      className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
+                      onClick={() => router.push(`/admin/category/addcategory?id=${row.id}`)}
+                    >
                       <Pencil className="w-4 h-4 text-[#ff5d2c]" />
                     </div>
-                    <div className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
+                    <div
+                      className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
+                      onClick={() => handleDelete(row.id)}
+                    >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </div>
                   </td>
