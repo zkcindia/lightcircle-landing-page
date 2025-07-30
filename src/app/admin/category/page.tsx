@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Popconfirm, message } from 'antd'; // ✅ added for delete confirmation
 import { getCategory, deleteCategory } from '@/service/apiCategory';
 
 const cards = [
@@ -52,15 +53,15 @@ export default function CategoryPage() {
 
   const handleDelete = async (id) => {
     try {
-      const confirmDelete = window.confirm('Are you sure you want to delete this category?');
-      if (!confirmDelete) return;
-
       const response = await deleteCategory(id);
       if (response.status === 204) {
         setCategoryRows((prev) => prev.filter((item) => item.id !== id));
+        message.success('Category deleted successfully');
+        fetchCategory()
       }
     } catch (error) {
       console.error('Error deleting category:', error);
+      message.error('Failed to delete category');
     }
   };
 
@@ -150,12 +151,22 @@ export default function CategoryPage() {
                     >
                       <Pencil className="w-4 h-4 text-[#ff5d2c]" />
                     </div>
-                    <div
-                      className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
-                      onClick={() => handleDelete(row.id)}
+
+                    {/* ✅ AntD Popconfirm Delete Button */}
+                    <Popconfirm
+                      title="Are you sure to delete this category?"
+                      description="This action cannot be undone."
+                      onConfirm={() => handleDelete(row.slug)}
+                      onCancel={() => message.info('Delete cancelled')}
+                      okText="Yes, Delete"
+                      cancelText="No"
+                      okButtonProps={{ style: { backgroundColor: '#ff4d4f' } }}
                     >
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </div>
+                      <div className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </div>
+                    </Popconfirm>
+
                   </td>
                 </tr>
               ))}

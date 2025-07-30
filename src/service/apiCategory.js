@@ -2,6 +2,7 @@ import axios from "axios";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
+// ✅ Save a new category
 export const saveCategory = async (formData) => {
   const tokenData = localStorage.getItem("token");
   const token = JSON.parse(tokenData);
@@ -15,7 +16,8 @@ export const saveCategory = async (formData) => {
   return res;
 };
 
-export const getCategory = async (id) => {
+// ✅ Get all categories
+export const getCategory = async () => {
   const tokenData = localStorage.getItem("token");
   const token = JSON.parse(tokenData);
   
@@ -26,6 +28,8 @@ export const getCategory = async (id) => {
   });
   return res;
 };
+
+// ✅ Delete a category
 export const deleteCategory = async (id) => {
   const tokenData = localStorage.getItem("token");
   const token = JSON.parse(tokenData);
@@ -38,24 +42,16 @@ export const deleteCategory = async (id) => {
   return res;
 };
 
+// ✅ Edit/Update an existing category
+export const editCategory = async (id, formData) => {
+  const tokenData = localStorage.getItem("token");
+  const token = JSON.parse(tokenData);
 
-// // edit api 
-// export const editCategory = async (id, payload) => {
-//   const tokenData = localStorage.getItem("token");
-//   const token = JSON.parse(tokenData);
-
-//   const formData = new FormData();
-//   formData.append("image", payload.image);   
-//   formData.append("name", payload.name);
-//   formData.append("creator", payload.creator);
-//   formData.append("stock", payload.stock);
-
-//   const res = await axios.put(`${URL}/category/${id}/`, formData, {
-//     headers: {
-//       Authorization: `Bearer ${token.access}`,
-//       'Content-Type': 'multipart/form-data',
-//     },
-//   });
-
-//   return res.data;
-// };
+  const res = await axios.put(`${URL}/category/${id}/`, formData, {
+    headers: {
+      Authorization: `Bearer ${token.access}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res;
+};
