@@ -132,7 +132,7 @@ export default function ProductPage() {
           <h2 className="text-lg font-semibold">All Product List</h2>
           <div className="flex gap-2 relative">
             <button
-              onClick={() => router.push('/admin/create')}
+              onClick={() => router.push('/admin/product/create')}
               className="bg-[#ff5d2c] hover:bg-[#ff3d00] text-white px-4 py-2 rounded-md font-medium cursor-pointer"
             >
               Add Product

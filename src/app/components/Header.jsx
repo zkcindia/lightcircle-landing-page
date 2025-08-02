@@ -2,15 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Phone, MessageCircle, User, ShoppingCart, Menu, ChevronDown } from "lucide-react";
+import { Phone, MessageCircle, User, Menu, ChevronDown } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { Dropdown } from "antd";
+import { getCategory } from "@/service/apiCategory";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileTypeOpen, setMobileTypeOpen] = useState(false);
   const [mobileSpaceOpen, setMobileSpaceOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -23,11 +25,25 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await getCategory();
+        setCategories(res.data);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleScrollTo = (id) => {
     setMobileMenuOpen(false);
     setMobileTypeOpen(false);
     setMobileSpaceOpen(false);
-    if (
+     if (id === "sale-page") {
+    router.push("/sale");
+     }else if (
       (pathname === "/contact" || pathname === "/aboutus" || pathname === "/login") &&
       id !== "about-section" &&
       id !== "contact-page"
@@ -53,16 +69,8 @@ export default function Header() {
 
   const navItems = [
     { label: "HOME", id: "home-section" },
-    { label: "SALE", id: "home-section" },
-    {
-      label: "SHOP BY TYPE",
-      dropdown: [
-        { label: "LIGHTS", id: "allproduct" },
-        { label: "FANS", id: "allproduct"}, 
-        { label: "HOME DECOR",id: "allproduct" },
-        { label: "NAME PLATES",id: "allproduct" },
-      ],
-    },
+    { label: "SALE", id: "sale-page" },
+    { label: "SHOP BY TYPE", type: "dropdown" },
     {
       label: "SHOP BY SPACE",
       megaMenu: [
@@ -99,19 +107,13 @@ export default function Header() {
   const shopByTypeMenu = (
     <div className="bg-white shadow-lg overflow-hidden">
       <ul className="w-48">
-        {navItems[2].dropdown.map((item) => (
+        {categories.map((cat) => (
           <li
-            key={item.label}
-            onClick={() => {
-              if (item.id === "allproduct") {
-                handleScrollTo("allproduct");
-              } else {
-                console.log(`${item.label} clicked`);
-              }
-            }}
+            key={cat.id}
+           onClick={() => router.push(`/allproduct?slug=${cat.slug}`)}
             className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
           >
-            {item.label}
+            {cat.name}
           </li>
         ))}
       </ul>
@@ -121,7 +123,7 @@ export default function Header() {
   const shopBySpaceMenu = (
     <div className="bg-white shadow-lg p-4 w-[600px]">
       <div className="grid grid-cols-3 gap-6">
-        {navItems[3].megaMenu.map((section) => (
+        {navItems.find((n) => n.label === "SHOP BY SPACE").megaMenu.map((section) => (
           <div key={section.title}>
             <h4 className="text-xs font-bold mb-3">{section.title}</h4>
             <ul className="space-y-2">
@@ -143,7 +145,7 @@ export default function Header() {
 
   return (
     <header className="w-full fixed top-0 left-0 z-50">
-      {/* Top bar */}
+      {/* Top Bar */}
       <div className="bg-white text-sm flex justify-center items-center gap-4 px-6 py-2 border-b border-gray-200">
         <div className="flex items-center gap-1 text-gray-600 cursor-pointer">
           <Phone size={16} /> <span>Talk On Call</span>
@@ -154,14 +156,14 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Offer Bar */}
+      {/* Offer Banner */}
       {!isScrolled && (
         <div className="bg-black text-yellow-400 text-center text-xs py-2">
           WELCOME TO LIGHT CIRCLE
         </div>
       )}
 
-      {/* Logo + Navbar */}
+      {/* Logo + Nav */}
       <div
         className={`relative z-10 transition duration-500 ${!isScrolled && "bg-transparent"}`}
         style={{
@@ -170,31 +172,21 @@ export default function Header() {
           backgroundPosition: "center",
         }}
       >
-        <nav className="relative flex justify-between items-center px-6 py-3 max-w-7xl mx-auto">
-          {/* Logo */}
-          <div
-            className="flex-shrink-0 cursor-pointer"
-            onClick={() => handleScrollTo("home-section")}
-          >
-            <Image src="/images/logo.png" alt="Logo" width={120} height={40} />
+        <nav className="relative flex justify-between items-center px-6 max-w-7xl mx-auto">
+          <div className="flex-shrink-0 cursor-pointer" onClick={() => handleScrollTo("home-section")}>
+            <Image src="/images/logo.png" alt="Logo" width={200} height={200} />
           </div>
 
-          {/* Desktop Nav */}
           <div className="hidden md:flex absolute left-1/2 -translate-x-1/2">
             <ul className="flex flex-nowrap gap-5 text-sm font-medium text-black whitespace-nowrap">
               {navItems.map((item) => {
                 if (item.label === "SALE") {
                   return (
-                    <li
-                      key={item.label}
-                      onClick={() => handleScrollTo(item.id)}
-                      className="flex items-center space-x-1 cursor-pointer hover:scale-105 transition-transform"
-                    >
-                      <span className="text-orange-500">SALE</span>
-                      <span className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
-                        %
-                      </span>
-                    </li>
+                   <li key={item.label} onClick={() => handleScrollTo(item.id)} className="flex items-center space-x-1 cursor-pointer hover:scale-105 transition-transform">
+  <span className="text-orange-500">SALE</span>
+  <span className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">%</span>
+</li>
+
                   );
                 } else if (item.label === "SHOP BY TYPE") {
                   return (
@@ -214,11 +206,7 @@ export default function Header() {
                   );
                 } else {
                   return (
-                    <li
-                      key={item.label}
-                      onClick={() => handleScrollTo(item.id)}
-                      className="cursor-pointer hover:text-orange-500 transition-colors"
-                    >
+                    <li key={item.label} onClick={() => handleScrollTo(item.id)} className="cursor-pointer hover:text-orange-500 transition-colors">
                       {item.label}
                     </li>
                   );
@@ -227,14 +215,9 @@ export default function Header() {
             </ul>
           </div>
 
-          {/* Right icons + mobile toggle */}
           <div className="flex items-center gap-4 text-black">
             <User className="cursor-pointer" onClick={() => router.push("/login")} />
-            {/* <ShoppingCart className="cursor-pointer" /> */}
-            <Menu
-              className="block md:hidden cursor-pointer"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            />
+            <Menu className="block md:hidden cursor-pointer" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
           </div>
         </nav>
 
@@ -242,42 +225,26 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white shadow-md px-6 py-4">
             <ul className="flex flex-col gap-4">
+              <li className="flex flex-col">
+                <button className="flex items-center justify-between text-black" onClick={() => setMobileTypeOpen(!mobileTypeOpen)}>
+                  SHOP BY TYPE <ChevronDown size={16} />
+                </button>
+                {mobileTypeOpen && (
+                  <ul className="pl-4 mt-2 space-y-2">
+                    {categories.map((cat) => (
+                      <li key={cat.id} onClick={() => router.push(`/category/${cat.id}`)} className="text-black cursor-pointer hover:text-orange-500">
+                        {cat.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+
               {navItems.map((item) => {
-                if (item.label === "SHOP BY TYPE") {
+                if (item.label === "SHOP BY SPACE") {
                   return (
                     <li key={item.label} className="flex flex-col">
-                      <button
-                        className="flex items-center justify-between text-black"
-                        onClick={() => setMobileTypeOpen(!mobileTypeOpen)}
-                      >
-                        {item.label} <ChevronDown size={16} />
-                      </button>
-                      {mobileTypeOpen && (
-                        <ul className="pl-4 mt-2 space-y-2">
-                          {item.dropdown.map((sub) => (
-                            <li
-                              key={sub.label}
-                              onClick={() =>
-                                sub.id === "allproduct"
-                                  ? handleScrollTo("allproduct")
-                                  : console.log(`${sub.label} clicked`)
-                              }
-                              className="text-black cursor-pointer hover:text-orange-500"
-                            >
-                              {sub.label}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  );
-                } else if (item.label === "SHOP BY SPACE") {
-                  return (
-                    <li key={item.label} className="flex flex-col">
-                      <button
-                        className="flex items-center justify-between text-black"
-                        onClick={() => setMobileSpaceOpen(!mobileSpaceOpen)}
-                      >
+                      <button className="flex items-center justify-between text-black" onClick={() => setMobileSpaceOpen(!mobileSpaceOpen)}>
                         {item.label} <ChevronDown size={16} />
                       </button>
                       {mobileSpaceOpen && (
@@ -287,11 +254,7 @@ export default function Header() {
                               <h4 className="text-xs font-bold mb-1">{section.title}</h4>
                               <ul className="space-y-1">
                                 {section.items.map((sub) => (
-                                  <li
-                                    key={sub.label}
-                                    onClick={() => handleScrollTo(sub.id)}
-                                    className="text-black cursor-pointer hover:text-orange-500"
-                                  >
+                                  <li key={sub.label} onClick={() => handleScrollTo(sub.id)} className="text-black cursor-pointer hover:text-orange-500">
                                     {sub.label}
                                   </li>
                                 ))}
@@ -302,13 +265,9 @@ export default function Header() {
                       )}
                     </li>
                   );
-                } else {
+                } else if (item.label !== "SHOP BY TYPE") {
                   return (
-                    <li
-                      key={item.label}
-                      onClick={() => handleScrollTo(item.id)}
-                      className="cursor-pointer text-black hover:text-orange-500"
-                    >
+                    <li key={item.label} onClick={() => handleScrollTo(item.id)} className="cursor-pointer text-black hover:text-orange-500">
                       {item.label}
                     </li>
                   );

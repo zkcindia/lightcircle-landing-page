@@ -53,7 +53,7 @@ export default function SideBar({
 
   const navItems = [
     { icon: <LayoutGrid size={18} />, label: "Dashboard",path: "/admin/dashboard" },
-    { icon: <Shirt size={18} />, label: "Products",path: "/admin/products" },
+    { icon: <Shirt size={18} />, label: "Products",path: "/admin/product" },
     { icon: <List size={18} />, label: "Category" ,path: "/admin/category" },
     { icon: <Box size={18} />, label: "Sub Category" ,path: "/admin/subcategory" },
     { icon: <Package size={18} />, label: "Inventory",path: "/admin/inventory" },

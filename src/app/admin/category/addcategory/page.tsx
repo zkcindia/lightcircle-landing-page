@@ -20,6 +20,7 @@ export default function CreateCategoryPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [image,setImage] = useState(null);
 
   const searchParams = useSearchParams();
   const data = searchParams.get('data');
@@ -63,9 +64,17 @@ export default function CreateCategoryPage() {
     setLoading(true);
     setSuccessMessage('');
     try {
+      const filterFormdata = new FormData()
+      filterFormdata.append('name',formData.name);
+      filterFormdata.append('created_by',formData.created_by);
+      filterFormdata.append('stock',formData.stock);
+      filterFormdata.append('tagId',formData.tagId);
+      filterFormdata.append('description',formData.description);
+      filterFormdata.append('image',image);
+
       // Here, we are reusing saveCategory for creation.
       // (For edit, you might want to call an update API instead.)
-      const res = await saveCategory(formData);
+      const res = await saveCategory(filterFormdata);
       console.log('Category saved:', res.data);
       setSuccessMessage('Category saved successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -102,6 +111,7 @@ export default function CreateCategoryPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImage(file)
       const reader = new FileReader();
       reader.onloadend = () => {
         setThumbnailUrl(reader.result as string);

@@ -1,13 +1,16 @@
-// app/admin/subcategory/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import {getSubCategory} from '@/service/apiSubCategory'
+import { getSubCategory, deleteSubCategory } from '@/service/apiSubCategory';
+import { Modal, message } from 'antd';
+import 'antd/dist/reset.css';
 
 export default function page() {
   const [subCategories, setSubCategories] = useState([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteSlug, setDeleteSlug] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -21,8 +24,29 @@ export default function page() {
         setSubCategories(response.data);
       }
     } catch (error) {
-      console.error("Failed to fetch subcategories", error);
+      console.error('Failed to fetch subcategories', error);
     }
+  };
+
+  const handleDelete = async (slug: string | null) => {
+    if (!slug) return;
+
+    try {
+      await deleteSubCategory(slug);
+      message.success('Subcategory deleted successfully');
+      fetchSubCategories();
+    } catch (error) {
+      console.error('Delete failed:', error?.response?.data || error.message);
+      message.error('Failed to delete subcategory');
+    } finally {
+      setIsDeleteModalOpen(false);
+      setDeleteSlug(null);
+    }
+  };
+
+  const openDeleteModal = (slug: string) => {
+    setDeleteSlug(slug);
+    setIsDeleteModalOpen(true);
   };
 
   return (
@@ -32,7 +56,7 @@ export default function page() {
           <h2 className="text-xl font-semibold">All Subcategories</h2>
           <button
             onClick={() => router.push('/admin/subcategory/addsubcategory')}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xs text-sm font-semibold"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xs text-sm font-semibold cursor-pointer"
           >
             Add Subcategory
           </button>
@@ -51,22 +75,27 @@ export default function page() {
             </thead>
             <tbody>
               {subCategories.map((sub, index) => (
-                <tr key={sub.id} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-2">{index + 1}</td>
+                <tr key={sub.id} className="border-b border-gray-200 hover:bg-gray-50">
+                   <td className="px-4 py-2">{index + 1}</td>
                   <td className="px-4 py-2">{sub.name}</td>
                   <td className="px-4 py-2">{sub.category}</td>
                   <td className="px-4 py-2">{sub.created_by}</td>
                   <td className="px-4 py-2 flex gap-2">
-                    <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300">
+                    <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
                       <Eye className="w-4 h-4 text-blue-500" />
                     </button>
                     <button
-                      onClick={() => router.push(`/admin/subcategory/addsubcategory?id=${sub.id}`)}
-                      className="p-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                      onClick={() =>
+                        router.push(`/admin/subcategory/addsubcategory?id=${sub.id}`)
+                      }
+                      className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
                     >
                       <Pencil className="w-4 h-4 text-green-500" />
                     </button>
-                    <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300">
+                    <button
+                      onClick={() => openDeleteModal(sub.slug)}
+                      className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
+                    >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
                   </td>
@@ -83,6 +112,20 @@ export default function page() {
           </table>
         </div>
       </div>
+
+      {/* ✅ Centered Delete Modal */}
+      <Modal
+        title="Are you sure to delete this subcategory?"
+        open={isDeleteModalOpen}
+        onOk={() => handleDelete(deleteSlug)}
+        onCancel={() => setIsDeleteModalOpen(false)}
+        okText="Yes, Delete"
+        cancelText="No"
+        centered
+        okButtonProps={{ style: { backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' } }}
+      >
+        <p>This action cannot be undone.</p>
+      </Modal>
     </main>
   );
 }

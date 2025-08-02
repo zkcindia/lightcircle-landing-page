@@ -2,11 +2,12 @@
 
 import React from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AllProductPage() {
-  const router = useRouter();
-
+   const searchParams = useSearchParams();
+  const slug = searchParams.get('slug');
+  console.log('Received slug:', slug);
   const lightProducts = Array.from({ length: 40 }, (_, i) => ({
     id: `light-${i + 1}`,
     name: `Light Product ${i + 1}`,

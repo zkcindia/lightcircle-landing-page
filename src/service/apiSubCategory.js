@@ -28,3 +28,33 @@ export const saveSubCategory = async(formData)=>{
   });
   return response;
 }
+
+
+// delete subcategory
+export const deleteSubCategory = async (id) => {
+  const tokenData = localStorage.getItem("token");
+  const token = JSON.parse(tokenData);
+
+  const response = await axios.delete(`${URL}/subcategory-parent/${id}/`, {
+    headers: {
+      Authorization: `Bearer ${token.access}`,
+    },
+  });
+  return response;
+};
+
+
+// sub category by id .
+
+
+export const getSubCategoryById = async (id) => {
+  const tokenData = localStorage.getItem("token");
+  const token = JSON.parse(tokenData);
+
+  const response = await axios.get(`${URL}/subcategory-parent/${id}/`, {
+    headers: {
+      Authorization: `Bearer ${token.access}`,
+    },
+  });
+  return response;
+};
