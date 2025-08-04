@@ -9,8 +9,12 @@ import { getSubCategoryById } from '@/service/apiSubCategory';
 export default function CreateProductPage() {
   const [productImage, setProductImage] = useState(null);
   const fileInputRef = useRef(null);
-  const [Category,setCategory] = useState([])
-  const [subcategory,setSubcategory] = useState([])
+  const [Category, setCategory] = useState([]);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+
+
+  const [subcategory, setSubcategory] = useState([]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -29,51 +33,43 @@ export default function CreateProductPage() {
 
   const [attributes, setAttributes] = useState([{ key: '', value: '' }]);
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchcategory();
-  },[])
+  }, []);
 
-  // fetch category
-const fetchcategory = async()=>{
-  try {
-    const response = await getCategory()
-    if(response.status===200){
-      setCategory(response.data)
-    }
-  } catch (error) {
-    console.log(error);
-    setCategory([])
-  }
-}
-
-  // fetch SubCategory
-  const fetchSubcategory = async(id)=>{
+  const fetchcategory = async () => {
     try {
-      const res = await getSubCategoryById(id);
-      if(res.status===200){
-        setSubcategory(res.data)
+      const response = await getCategory();
+      if (response.status === 200) {
+        setCategory(response.data);
       }
     } catch (error) {
       console.log(error);
-      setSubcategory([])
-      
+      setCategory([]);
     }
-  }
+  };
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({ ...prev, [name]: value }));
-  // };
-const handleChange = async (e) => {
-  const { name, value } = e.target;
+  const fetchSubcategory = async (id) => {
+    try {
+      const res = await getSubCategoryById(id);
+      if (res) {
+        setSubcategory(res.data);
+      }
+    } catch (error) {
+      console.log(error);
+      setSubcategory([]);
+    }
+  };
 
-  if (name === 'category') {
-    setFormData((prev) => ({ ...prev, category: value, subcategory: '' }));
-    await fetchSubcategory(value); // Fetch based on category ID
-  } else {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }
-};
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    if (name === 'category') {
+      setFormData((prev) => ({ ...prev, category: value, subcategory: '' }));
+      await fetchSubcategory(value);
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
 
   const handleAttributeChange = (index, field, value) => {
     const updated = [...attributes];
@@ -98,29 +94,29 @@ const handleChange = async (e) => {
     if (file) setProductImage(file);
   };
 
-  const handleSubmit = async () => {
-    const form = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      form.append(key, value);
-    });
-
-    attributes.forEach((attr, index) => {
-      form.append(`attributes[${index}][key]`, attr.key);
-      form.append(`attributes[${index}][value]`, attr.value);
-    });
-
-    if (productImage) {
-      form.append('thumbnail', productImage);
-    }
-
-    try {
-      await createProduct(form);
-      alert('Product created successfully!');
-    } catch (error) {
-      console.error('Error creating product:', error);
-      alert('Failed to create product');
-    }
+const handleSubmit = async () => {
+  const form = new FormData();
+  const dataPayload = {
+    ...formData,
+    attributes,
   };
+  form.append('data', JSON.stringify(dataPayload));
+  form.append('parent_category_slug', formData.subcategory);
+
+  if (productImage) {
+    form.append('image', productImage);
+  }
+
+  try {
+    await createProduct(form);
+    setShowSuccessModal(true); // ✅ Keep this
+    // ❌ Remove timeout: no auto-close or reset
+  } catch (error) {
+    console.error('Error creating product:', error);
+    setShowErrorModal(true);
+
+  }
+};
 
   const handleRemoveProduct = () => {
     setProductImage(null);
@@ -155,9 +151,7 @@ const handleChange = async (e) => {
                 alt="Preview"
                 className="mx-auto h-80 object-contain"
               />
-              {formData.name && (
-                <h3 className="text-lg font-semibold mt-4">{formData.name}</h3>
-              )}
+              {formData.name && <h3 className="text-lg font-semibold mt-4">{formData.name}</h3>}
               {(formData.category || formData.subcategory) && (
                 <span className="text-sm text-gray-500">
                   ({formData.category}{formData.subcategory && ` > ${formData.subcategory}`})
@@ -258,17 +252,7 @@ const handleChange = async (e) => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Input label="Product Name" name="name" value={formData.name} onChange={handleChange} />
               <Select label="Product Categories" name="category" value={formData.category} onChange={handleChange} options={Category} />
-              {/* <Select label="Subcategory" name="subcategory" value={formData.subcategory} onChange={handleChange} options={[
-                'Smartphones', 'Laptops', 'T-Shirts', 'Shoes', 'Chairs', 'Speakers', 'Track Pants', 'Luxury'
-              ]} /> */}
-              <Select
-  label="Subcategory"
-  name="subcategory"
-  value={formData.subcategory}
-  onChange={handleChange}
-  options={subcategory}
-/>
-
+              <Select label="Subcategory" name="subcategory" value={formData.subcategory} onChange={handleChange} options={subcategory} />
               <Input label="Brand" name="brand" value={formData.brand} onChange={handleChange} />
               <Input label="Weight" name="weight" value={formData.weight} onChange={handleChange} />
             </div>
@@ -321,7 +305,7 @@ const handleChange = async (e) => {
             </div>
           </div>
 
-          {/* Tag, Stock, Tag No */}
+          {/* Inventory & Tags */}
           <div>
             <h2 className="text-lg font-bold text-[#1d2a3b] mb-4">Inventory & Tags</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -332,6 +316,73 @@ const handleChange = async (e) => {
           </div>
         </div>
       </div>
+
+      {showSuccessModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/60 bg-opacity-40 z-50">
+    <div className="bg-white rounded-xl shadow-xl p-6 text-center max-w-sm w-full animate-fade-in">
+      <div className="flex justify-center mb-4">
+        <div className="bg-green-100 rounded-full p-2">
+          <svg
+            className="w-8 h-8 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+      </div>
+      <h2 className="text-xl font-semibold text-gray-800">Success</h2>
+      <p className="text-gray-600 mt-2">Product created successfully!</p>
+      {/* <button
+        className="bg-green-600 text-white mt-4 px-4 py-2 rounded hover:bg-green-700"
+        onClick={() => setShowSuccessModal(false)}
+      >
+        OK
+      </button> */}<button
+  className="bg-green-600 text-white mt-4 px-4 py-2 rounded hover:bg-green-700"
+  onClick={() => {
+    setShowSuccessModal(false);
+    handleRemoveProduct();
+  }}
+  
+>
+  OK
+</button>
+
+    </div>
+  </div>
+)}
+{showErrorModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/60 bg-opacity-40 z-50">
+    <div className="bg-white rounded-xl shadow-xl p-6 text-center max-w-sm w-full animate-fade-in">
+      <div className="flex justify-center mb-4">
+        <div className="bg-red-100 rounded-full p-2">
+          <svg
+            className="w-8 h-8 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </div>
+      </div>
+      <h2 className="text-xl font-semibold text-gray-800">Error</h2>
+      <p className="text-gray-600 mt-2">Failed to create product</p>
+      <button
+        className="bg-red-600 text-white mt-4 px-4 py-2 rounded hover:bg-red-700"
+        onClick={() => setShowErrorModal(false)}
+      >
+        OK
+      </button>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }
@@ -351,36 +402,10 @@ const Input = ({ label, name, value, onChange, type = 'text' }) => (
   </div>
 );
 
-// const Select = ({ label, name, value, onChange, options }) => (
-//   <div>
-//     <label className="text-sm text-gray-700">{label}</label>
-//     <select
-//       className={dropdownStyle}
-//       name={name}
-//       value={value}
-//       onChange={onChange}
-//     >
-//       <option disabled value="">Select {label}</option>
-//       {options.map((option) => (
-//         <option
-//           key={option.id || option}
-//           value={option.id || option}
-//         >
-//           {option.name || option}
-//         </option>
-//       ))}
-//     </select>
-//   </div>
-// );
 const Select = ({ label, name, value, onChange, options }) => (
   <div>
     <label className="text-sm text-gray-700">{label}</label>
-    <select
-      className={dropdownStyle}
-      name={name}
-      value={value}
-      onChange={onChange}
-    >
+    <select className={dropdownStyle} name={name} value={value} onChange={onChange}>
       <option disabled value="">Select {label}</option>
       {options.map((option) => {
         const key = typeof option === 'object' ? option.id : option;
@@ -395,7 +420,6 @@ const Select = ({ label, name, value, onChange, options }) => (
     </select>
   </div>
 );
-
 
 const inputStyle =
   'mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm text-gray-700';

@@ -17,4 +17,19 @@ export async function createProduct(data) {
     console.error('Error creating product:', error);
     throw error;
   }
+} 
+// GET API to fetch all products
+export async function getAllProducts() {
+  try {
+    const response = await axios.get(`${URL}/item/`, {
+      headers: {
+        Authorization: `Bearer ${token.access}`,
+      },
+    });
+    return response.data; // Return only data if needed
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
+  }
 }
+

@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
+console.log(URL);
 
 // fetch sub category
 export const getSubCategory = async()=>{
@@ -50,8 +51,9 @@ export const deleteSubCategory = async (id) => {
 export const getSubCategoryById = async (id) => {
   const tokenData = localStorage.getItem("token");
   const token = JSON.parse(tokenData);
+console.log('call',URL);
 
-  const response = await axios.get(`${URL}/subcategory-parent/${id}/`, {
+  const response = await axios.get(`${URL}/category/sub/${id}/`, {
     headers: {
       Authorization: `Bearer ${token.access}`,
     },
