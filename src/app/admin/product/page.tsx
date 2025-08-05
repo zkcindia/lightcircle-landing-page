@@ -1,21 +1,20 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Pencil, Trash2, Star } from 'lucide-react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { getAllProducts } from '@/service/apiCreate';
-
-
-
+import React, { useEffect, useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { getAllProducts, deleteProduct } from "@/service/apiCreate";
 
 export default function ProductPage() {
   const router = useRouter();
-  const [selectedMonth, setSelectedMonth] = useState('This Month');
+  const [selectedMonth, setSelectedMonth] = useState("This Month");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [products, setProducts] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const months = ['This Month', 'Last Month', 'Last 3 Months', 'Last 6 Months'];
+  const months = ["This Month", "Last Month", "Last 3 Months", "Last 6 Months"];
 
   useEffect(() => {
     async function fetchData() {
@@ -23,11 +22,32 @@ export default function ProductPage() {
         const data = await getAllProducts();
         setProducts(data);
       } catch (err) {
-        console.error('Failed to load products:', err);
+        console.error("Failed to load products:", err);
       }
     }
     fetchData();
   }, []);
+
+  const handleDeleteClick = (id) => {
+    setDeleteTarget(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteTarget) {
+      setIsDeleting(true);
+      try {
+        await deleteProduct(deleteTarget);
+        setProducts(products.filter((item) => item.id !== deleteTarget));
+      } catch (error) {
+        console.error("Delete failed:", error);
+      } finally {
+        setIsDeleting(false);
+        setShowDeleteModal(false);
+        setDeleteTarget(null);
+      }
+    }
+  };
 
   return (
     <section className="p-6 bg-[#f9f7f7] min-h-screen">
@@ -36,7 +56,7 @@ export default function ProductPage() {
           <h2 className="text-lg font-semibold">All Product List</h2>
           <div className="flex gap-2 relative">
             <button
-              onClick={() => router.push('/admin/product/create')}
+              onClick={() => router.push("/admin/product/create")}
               className="bg-[#ff5d2c] hover:bg-[#ff3d00] text-white px-4 py-2 rounded-md font-medium cursor-pointer"
             >
               Add Product
@@ -79,73 +99,69 @@ export default function ProductPage() {
                 <th className="py-3">Price</th>
                 <th className="py-3">Stock</th>
                 <th className="py-3">Category</th>
-                {/* <th className="py-3">Rating</th> */}
                 <th className="py-3">Action</th>
               </tr>
             </thead>
-           <tbody className="text-sm">
-  {products.map((item, index) => {
-    const product = item.data || {};
-    const imageUrl = item.image_url || '/default-image.png'; // fallback image
-    return (
-      <tr
-        key={index}
-        className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
-      >
-        <td className="py-4">
-          <input type="checkbox" />
-        </td>
-        <td className="py-4 flex items-center gap-3">
-          <img
-            src={item?.image_url || ''}
-            alt={product.name || 'Product Image'}
-            width={48}
-            height={48}
-            className="rounded-md"
-          />
-          <div>
-            <p className="font-medium">{product.name || '-'}</p>
-            <p className="text-gray-500 text-xs">
-              Size: {product.sizes?.join(', ') || 'N/A'}
-            </p>
-          </div>
-        </td>
-        <td className="py-4">${parseFloat(product.price || 0).toFixed(2)}</td>
-        <td className="py-4">
-          <p>{product.stock || 0} Item Left</p>
-          <p className="text-gray-500 text-xs">{product.sold || 0} Sold</p>
-        </td>
-        <td className="py-4">{product.category || item?.parent_category_slug || '-'}</td>
-        {/* <td className="py-4 flex items-center gap-1">
-          <div className="bg-gray-200 px-2 py-1 rounded-md flex items-center gap-1">
-            <Star className="w-4 h-4 text-yellow-500" />
-            <span className="font-medium text-sm">{product.rating || '0.0'}</span>
-          </div>
-          <span className="text-gray-500 text-xs">
-            {product.reviews || 0} Review
-          </span>
-        </td> */}
-        <td className="py-4">
-          <div className="flex items-center gap-2">
-            <div
-              className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
-              onClick={() => router.push(`/admin/product/edit/${item.id}`)}
-            >
-              <Pencil className="w-4 h-4 text-[#ff5d2c]" />
-            </div>
-            <div className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
-              <Trash2 className="w-4 h-4 text-red-500" />
-            </div>
-          </div>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-
+            <tbody className="text-sm">
+              {products.map((item, index) => {
+                const product = item.data || {};
+                return (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+                  >
+                    <td className="py-4">
+                      <input type="checkbox" />
+                    </td>
+                    <td className="py-4 flex items-center gap-3">
+                      <img
+                        src={item?.image_url || "/default-image.png"}
+                        alt={product.name || "Product Image"}
+                        width={48}
+                        height={48}
+                        className="rounded-md"
+                      />
+                      <div>
+                        <p className="font-medium">{product.name || "-"}</p>
+                        <p className="text-gray-500 text-xs">
+                          Size: {product.sizes?.join(", ") || "N/A"}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="py-4">
+                      ${parseFloat(product.price || 0).toFixed(2)}
+                    </td>
+                    <td className="py-4">
+                      <p>{product.stock || 0} Item Left</p>
+                      <p className="text-gray-500 text-xs">{product.sold || 0} Sold</p>
+                    </td>
+                    <td className="py-4">
+                      {product.category || item?.parent_category_slug || "-"}
+                    </td>
+                    <td className="py-4">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
+                          onClick={() => router.push(`/admin/product/create?id=${item.id}`)}
+                        >
+                          <Pencil className="w-4 h-4 text-[#ff5d2c]" />
+                        </div>
+                        <div
+                          className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
+                          onClick={() => handleDeleteClick(item.id)}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
         </div>
 
+        {/* PAGINATION */}
         <div className="flex justify-end mt-6">
           <div className="inline-flex items-center space-x-1 border rounded-md overflow-hidden">
             <button className="px-3 py-1 text-sm text-blue-700 hover:bg-gray-200 cursor-pointer">Previous</button>
@@ -156,6 +172,42 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+          <div className="bg-white rounded-lg shadow p-6 w-full max-w-md relative">
+            {/* close icon */}
+            <button
+              onClick={() => setShowDeleteModal(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl cursor-pointer"
+            >
+              &times;
+            </button>
+
+            <h3 className="text-lg font-semibold mb-2">
+              Are you sure to delete this product?
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">This action cannot be undone.</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="border px-4 py-2 rounded-md text-gray-600"
+                disabled={isDeleting}
+              >
+                No
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="bg-red-500 text-white px-4 py-2 rounded-md disabled:opacity-50"
+              >
+                {isDeleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
