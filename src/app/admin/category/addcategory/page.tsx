@@ -27,31 +27,33 @@ export default function CreateCategoryPage() {
   const router = useRouter();
 
   // If editing, fetch category details using GET API.
-  useEffect(() => {
-    if (data) {
-      async function fetchCategoryData() {
-        try {
-          const data = await getCategory(id);
-          setFormData({
-            name: data.name || '',
-            created_by: data.created_by || '',
-            stock: data.stock || '',
-            tagId: data.tagId || '',
-            description: data.description || '',
-            metaTitle: data.metaTitle || '',
-            metaKeyword: data.metaKeyword || '',
-            metaDescription: data.metaDescription || '',
-          });
-          if (data.thumbnail) {
-            setThumbnailUrl(data.thumbnail);
-          }
-        } catch (error) {
-          console.error('Error fetching category data:', error);
+ useEffect(() => {
+  if (data) {
+    async function fetchCategoryData() {
+      try {
+        const response = await getCategory();
+        const category = response.data;
+        setFormData({
+          name: category.name || '',
+          created_by: category.created_by || '',
+          stock: category.stock || '',
+          tagId: category.tagId || '',
+          description: category.description || '',
+          metaTitle: category.metaTitle || '',
+          metaKeyword: category.metaKeyword || '',
+          metaDescription: category.metaDescription || '',
+        });
+        if (category.thumbnail) {
+          setThumbnailUrl(category.thumbnail);
         }
+      } catch (error) {
+        console.error('Error fetching category data:', error);
       }
-      fetchCategoryData();
     }
-  }, [data]);
+    fetchCategoryData();
+  }
+}, [data]);
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
