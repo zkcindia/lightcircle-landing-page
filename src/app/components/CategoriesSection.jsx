@@ -25,6 +25,7 @@ export default function CategoriesSection() {
     { name: "Metal Plate", image: "/images/metal.jpeg" },
   ];
 
+
   return (
     <section className="w-full bg-white py-12">
       {/* EXPLORE OUR LIGHTS */}
@@ -33,7 +34,6 @@ export default function CategoriesSection() {
           EXPLORE <span className="font-bold">OUR LIGHTS</span>
         </h2>
       </div>
-
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-4 mb-20">
         {categories.map((category, index) => (
           <div
