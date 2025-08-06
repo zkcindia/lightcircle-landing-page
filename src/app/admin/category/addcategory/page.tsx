@@ -20,7 +20,8 @@ export default function CreateCategoryPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [image,setImage] = useState(null);
+  const [image, setImage] = useState<File | null>(null);
+
 
   const searchParams = useSearchParams();
   const data = searchParams.get('data');
