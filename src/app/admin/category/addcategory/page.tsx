@@ -73,7 +73,9 @@ export default function CreateCategoryPage() {
       filterFormdata.append('stock',formData.stock);
       filterFormdata.append('tagId',formData.tagId);
       filterFormdata.append('description',formData.description);
-      filterFormdata.append('image',image);
+      if (image) {
+      filterFormdata.append('image', image);
+    }
 
       // Here, we are reusing saveCategory for creation.
       // (For edit, you might want to call an update API instead.)
