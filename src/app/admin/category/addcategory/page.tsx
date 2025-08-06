@@ -148,7 +148,7 @@ export default function CreateCategoryPage() {
           <div className="mt-4 space-y-2 text-sm text-gray-600">
             <div className="flex justify-between">
               <span className="font-semibold">Created By :</span>
-              <span className="text-blue-500">{formData.created_by || data?.created_by}</span>
+              <span className="text-blue-500">{formData.created_by}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-semibold">Stock :</span>
