@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import {  Pencil, Trash2 } from 'lucide-react';
 import { Modal, message } from 'antd';
 import { getCategory, deleteCategory } from '@/service/apiCategory';
 
@@ -19,6 +19,7 @@ export default function CategoryPage() {
   const [categoryRows, setCategoryRows] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteSlug, setDeleteSlug] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Spinner state
 
   useEffect(() => {
     fetchCategory();
@@ -26,17 +27,21 @@ export default function CategoryPage() {
 
   const fetchCategory = async () => {
     try {
+      setIsLoading(true);
       const response = await getCategory();
       if (response.status === 200) {
         setCategoryRows(response.data);
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDelete = async (id:any) => {
+  const handleDelete = async (id: any) => {
     try {
+      setIsLoading(true);
       const response = await deleteCategory(id);
       if (response.status === 204) {
         setCategoryRows((prev) => prev.filter((item) => item.slug !== id));
@@ -47,8 +52,23 @@ export default function CategoryPage() {
       console.error('Error deleting category:', error);
       message.error('Failed to delete category');
     } finally {
+      setIsLoading(false);
       setIsDeleteModalOpen(false);
     }
+  };
+
+  const handleEdit = (id: any) => {
+    setIsLoading(true);
+    setTimeout(() => {
+      router.push(`/admin/category/addcategory?id=${id}`);
+    }, 300); // Small delay for UX
+  };
+
+  const handleAddCategory = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      router.push('/admin/category/addcategory');
+    }, 300);
   };
 
   const getMonthOptions = () => [
@@ -60,6 +80,13 @@ export default function CategoryPage() {
 
   return (
     <main className="min-h-screen p-8 bg-gray-50 cursor-crosshair">
+      {/* FULLSCREEN LOADING SPINNER */}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+          <div className="w-12 h-12 rounded-full border-t-4 border-b-4 border-orange-500 animate-spin"></div>
+        </div>
+      )}
+
       {/* Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {cards.map((card, index) => (
@@ -84,7 +111,7 @@ export default function CategoryPage() {
           <h2 className="text-xl font-semibold">All Categories List</h2>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => router.push('/admin/category/addcategory')}
+              onClick={handleAddCategory}
               className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition cursor-pointer"
             >
               Add Category
@@ -129,20 +156,24 @@ export default function CategoryPage() {
                   <td className="px-4 py-2">{row.id}</td>
                   <td className="px-4 py-2">{row.quantity || 0}</td>
                   <td className="px-4 py-2 flex gap-2">
-                    <div className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
+                    {/* <div className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
                       <Eye className="w-4 h-4 text-[#ff5d2c]" />
-                    </div>
+                    </div> */}
                     <div
                       className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
-                      onClick={() => router.push(`/admin/category/addcategory?id=${row.id}`)}
+                      onClick={() => handleEdit(row.id)}
                     >
                       <Pencil className="w-4 h-4 text-[#ff5d2c]" />
                     </div>
                     <div
                       className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
                       onClick={() => {
-                        setDeleteSlug(row.slug);
-                        setIsDeleteModalOpen(true);
+                        setIsLoading(true);
+                        setTimeout(() => {
+                          setDeleteSlug(row.slug);
+                          setIsDeleteModalOpen(true);
+                          setIsLoading(false);
+                        }, 200); // slight delay to show the spinner
                       }}
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />

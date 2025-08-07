@@ -55,3 +55,15 @@ export const editCategory = async (id, formData) => {
   });
   return res;
 };
+
+
+// ✅ Get single category by ID or Slug
+export async function getSingleCategory(idOrSlug) {
+  const token = JSON.parse(localStorage.getItem("token"));
+
+  return await axios.get(`${URL}/${idOrSlug}/`, {
+    headers: {
+      Authorization: `Bearer ${token?.access}`,
+    },
+  });
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getSubCategory, deleteSubCategory } from '@/service/apiSubCategory';
 import { Modal, message } from 'antd';
@@ -11,6 +11,7 @@ export default function page() {
   const [subCategories, setSubCategories] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteSlug, setDeleteSlug] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // 👈 loading state added
   const router = useRouter();
 
   useEffect(() => {
@@ -18,6 +19,7 @@ export default function page() {
   }, []);
 
   const fetchSubCategories = async () => {
+    setIsLoading(true); // 👈 start loading
     try {
       const response = await getSubCategory();
       if (response.status === 200) {
@@ -25,12 +27,15 @@ export default function page() {
       }
     } catch (error) {
       console.error('Failed to fetch subcategories', error);
+    } finally {
+      setIsLoading(false); // 👈 stop loading
     }
   };
 
   const handleDelete = async (slug: string | null) => {
     if (!slug) return;
 
+    setIsLoading(true); // 👈 start loading
     try {
       await deleteSubCategory(slug);
       message.success('Subcategory deleted successfully');
@@ -41,6 +46,7 @@ export default function page() {
     } finally {
       setIsDeleteModalOpen(false);
       setDeleteSlug(null);
+      setIsLoading(false); // 👈 stop loading
     }
   };
 
@@ -51,12 +57,22 @@ export default function page() {
 
   return (
     <main className="min-h-screen p-8 bg-gray-50">
+      {/* 👇 Fullscreen Spinner Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+          <div className="w-12 h-12 rounded-full border-t-4 border-b-4 border-orange-500 animate-spin"></div>
+        </div>
+      )}
+
       <div className="bg-white rounded-xl shadow p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">All Subcategories</h2>
           <button
-            onClick={() => router.push('/admin/subcategory/addsubcategory')}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xs text-sm font-semibold cursor-pointer"
+            onClick={() => {
+              setIsLoading(true);
+              router.push('/admin/subcategory/addsubcategory');
+            }}
+            className="bg-orange-500 hover:bg-orange-600 !text-white px-4 py-2 rounded-md text-sm font-semibold transition cursor-pointer"
           >
             Add Subcategory
           </button>
@@ -76,21 +92,22 @@ export default function page() {
             <tbody>
               {subCategories.map((sub, index) => (
                 <tr key={sub.id} className="border-b border-gray-200 hover:bg-gray-50">
-                   <td className="px-4 py-2">{index + 1}</td>
+                  <td className="px-4 py-2">{index + 1}</td>
                   <td className="px-4 py-2">{sub.name}</td>
                   <td className="px-4 py-2">{sub.category}</td>
                   <td className="px-4 py-2">{sub.created_by}</td>
                   <td className="px-4 py-2 flex gap-2">
-                    <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
-                      <Eye className="w-4 h-4 text-blue-500" />
-                    </button>
+                    {/* <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
+                      <Eye className="w-4 h-4 text-[#ff5d2c]" />
+                    </button> */}
                     <button
-                      onClick={() =>
-                        router.push(`/admin/subcategory/addsubcategory?id=${sub.id}`)
-                      }
+                      onClick={() => {
+                        setIsLoading(true);
+                        router.push(`/admin/subcategory/addsubcategory?id=${sub.id}`);
+                      }}
                       className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
                     >
-                      <Pencil className="w-4 h-4 text-green-500" />
+                      <Pencil className="w-4 h-4 text-[#ff5d2c]" />
                     </button>
                     <button
                       onClick={() => openDeleteModal(sub.slug)}
