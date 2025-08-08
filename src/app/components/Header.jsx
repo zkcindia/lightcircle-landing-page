@@ -13,6 +13,7 @@ export default function Header() {
   const [mobileTypeOpen, setMobileTypeOpen] = useState(false);
   const [mobileSpaceOpen, setMobileSpaceOpen] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -41,12 +42,21 @@ export default function Header() {
     setMobileMenuOpen(false);
     setMobileTypeOpen(false);
     setMobileSpaceOpen(false);
-     if (id === "sale-page") {
-    router.push("/sale");
-     }else if (
+
+    if (["home-section", "sale-page", "about-section", "contact-page", "blog-page"].includes(id)) {
+      setIsLoading(true);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 800);
+    }
+
+    if (id === "sale-page") {
+      router.push("/sale");
+    } else if (
       (pathname === "/contact" || pathname === "/aboutus" || pathname === "/login") &&
       id !== "about-section" &&
-      id !== "contact-page"
+      id !== "contact-page" &&
+      id !== "blog-page"
     ) {
       router.push(`/?scrollTo=${id}`);
     } else if (id === "contact-page") {
@@ -110,7 +120,7 @@ export default function Header() {
         {categories.map((cat) => (
           <li
             key={cat.id}
-           onClick={() => router.push(`/allproduct?slug=${cat.slug}`)}
+            onClick={() => router.push(`/allproduct?slug=${cat.slug}`)}
             className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
           >
             {cat.name}
@@ -145,7 +155,12 @@ export default function Header() {
 
   return (
     <header className="w-full fixed top-0 left-0 z-50">
-      {/* Top Bar */}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+          <div className="w-12 h-12 rounded-full border-t-4 border-b-4 border-orange-500 animate-spin"></div>
+        </div>
+      )}
+
       <div className="bg-white text-sm flex justify-center items-center gap-4 px-6 py-2 border-b border-gray-200">
         <div className="flex items-center gap-1 text-gray-600 cursor-pointer">
           <Phone size={16} /> <span>Talk On Call</span>
@@ -156,14 +171,12 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Offer Banner */}
       {!isScrolled && (
         <div className="bg-black text-yellow-400 text-center text-xs py-2">
           WELCOME TO LIGHT CIRCLE
         </div>
       )}
 
-      {/* Logo + Nav */}
       <div
         className={`relative z-10 transition duration-500 ${!isScrolled && "bg-transparent"}`}
         style={{
@@ -182,11 +195,14 @@ export default function Header() {
               {navItems.map((item) => {
                 if (item.label === "SALE") {
                   return (
-                   <li key={item.label} onClick={() => handleScrollTo(item.id)} className="flex items-center space-x-1 cursor-pointer hover:scale-105 transition-transform">
-  <span className="text-orange-500">SALE</span>
-  <span className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">%</span>
-</li>
-
+                    <li
+                      key={item.label}
+                      onClick={() => handleScrollTo(item.id)}
+                      className="flex items-center space-x-1 cursor-pointer hover:scale-105 transition-transform"
+                    >
+                      <span className="text-orange-500">SALE</span>
+                      <span className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">%</span>
+                    </li>
                   );
                 } else if (item.label === "SHOP BY TYPE") {
                   return (
@@ -206,7 +222,11 @@ export default function Header() {
                   );
                 } else {
                   return (
-                    <li key={item.label} onClick={() => handleScrollTo(item.id)} className="cursor-pointer hover:text-orange-500 transition-colors">
+                    <li
+                      key={item.label}
+                      onClick={() => handleScrollTo(item.id)}
+                      className="cursor-pointer hover:text-orange-500 transition-colors"
+                    >
                       {item.label}
                     </li>
                   );
@@ -221,18 +241,24 @@ export default function Header() {
           </div>
         </nav>
 
-        {/* Mobile Nav */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-white shadow-md px-6 py-4">
             <ul className="flex flex-col gap-4">
               <li className="flex flex-col">
-                <button className="flex items-center justify-between text-black" onClick={() => setMobileTypeOpen(!mobileTypeOpen)}>
+                <button
+                  className="flex items-center justify-between text-black"
+                  onClick={() => setMobileTypeOpen(!mobileTypeOpen)}
+                >
                   SHOP BY TYPE <ChevronDown size={16} />
                 </button>
                 {mobileTypeOpen && (
                   <ul className="pl-4 mt-2 space-y-2">
                     {categories.map((cat) => (
-                      <li key={cat.id} onClick={() => router.push(`/category/${cat.id}`)} className="text-black cursor-pointer hover:text-orange-500">
+                      <li
+                        key={cat.id}
+                        onClick={() => router.push(`/category/${cat.id}`)}
+                        className="text-black cursor-pointer hover:text-orange-500"
+                      >
                         {cat.name}
                       </li>
                     ))}
@@ -244,7 +270,10 @@ export default function Header() {
                 if (item.label === "SHOP BY SPACE") {
                   return (
                     <li key={item.label} className="flex flex-col">
-                      <button className="flex items-center justify-between text-black" onClick={() => setMobileSpaceOpen(!mobileSpaceOpen)}>
+                      <button
+                        className="flex items-center justify-between text-black"
+                        onClick={() => setMobileSpaceOpen(!mobileSpaceOpen)}
+                      >
                         {item.label} <ChevronDown size={16} />
                       </button>
                       {mobileSpaceOpen && (
@@ -254,7 +283,11 @@ export default function Header() {
                               <h4 className="text-xs font-bold mb-1">{section.title}</h4>
                               <ul className="space-y-1">
                                 {section.items.map((sub) => (
-                                  <li key={sub.label} onClick={() => handleScrollTo(sub.id)} className="text-black cursor-pointer hover:text-orange-500">
+                                  <li
+                                    key={sub.label}
+                                    onClick={() => handleScrollTo(sub.id)}
+                                    className="text-black cursor-pointer hover:text-orange-500"
+                                  >
                                     {sub.label}
                                   </li>
                                 ))}
@@ -267,7 +300,11 @@ export default function Header() {
                   );
                 } else if (item.label !== "SHOP BY TYPE") {
                   return (
-                    <li key={item.label} onClick={() => handleScrollTo(item.id)} className="cursor-pointer text-black hover:text-orange-500">
+                    <li
+                      key={item.label}
+                      onClick={() => handleScrollTo(item.id)}
+                      className="cursor-pointer text-black hover:text-orange-500"
+                    >
                       {item.label}
                     </li>
                   );
