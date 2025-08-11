@@ -28,6 +28,18 @@ export const getCategory = async () => {
   });
   return res;
 };
+export const getCategoryById = async (id) => {
+  const tokenData = localStorage.getItem("token");
+  const token = JSON.parse(tokenData);
+  
+  const res = await axios.get(`${URL}/category/${id}/`, {
+    headers: {
+      Authorization: `Bearer ${token.access}`,
+    },
+  });
+  return res;
+};
+
 
 // ✅ Delete a category
 export const deleteCategory = async (id) => {

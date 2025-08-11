@@ -161,7 +161,7 @@ export default function CategoryPage() {
                     </div> */}
                     <div
                       className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
-                      onClick={() => handleEdit(row.id)}
+                      onClick={() => handleEdit(row.slug)}
                     >
                       <Pencil className="w-4 h-4 text-[#ff5d2c]" />
                     </div>

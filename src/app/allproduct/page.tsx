@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getProductById, getProductByIds } from "@/service/apiCreate";
 
 export default function AllProductPage() {
   const router = useRouter();
@@ -10,41 +12,44 @@ export default function AllProductPage() {
   const slug = searchParams.get("slug");
   console.log("Received slug:", slug);
 
-  const [isLoading, setIsLoading] = useState(false); // 🔹 Added loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
-  // Product data (40 per category)
-  const productsData = {
-    light: Array.from({ length: 40 }, (_, i) => ({
-      id: `light-${i + 1}`,
-      name: `Light Product ${i + 1}`,
-      price: `₹${7500 + i * 100}`,
-      oldPrice: `₹${10000 + i * 100}`,
-      image: `/images/light/${i + 1}.jpeg`,
-    })),
-    fan: Array.from({ length: 40 }, (_, i) => ({
-      id: `fan-${i + 1}`,
-      name: `Fan Product ${i + 1}`,
-      price: `₹${5500 + i * 80}`,
-      oldPrice: `₹${8000 + i * 80}`,
-      image: `/images/light/${i + 41}.jpeg`,
-    })),
-    "home-decor": Array.from({ length: 40 }, (_, i) => ({
-      id: `decor-${81 + i}`,
-      name: `Home Decor ${81 + i}`,
-      price: `₹${3500 + i * 50}`,
-      oldPrice: `₹${5000 + i * 50}`,
-      image: `/images/light/${81 + i}.jpeg`,
-    })),
-    "name-plate": Array.from({ length: 40 }, (_, i) => ({
-      id: `nameplate-${121 + i}`,
-      name: `Name Plate ${121 + i}`,
-      price: `₹${2500 + i * 40}`,
-      oldPrice: `₹${4000 + i * 40}`,
-      image: `/images/light/${121 + i}.jpeg`,
-    })),
-  };
+  // Fetch products from API when page loads
+  useEffect(() => {
+    setLoadingProducts(true);
+    fetchProduct();
+    // axios
+    //   .get("http://192.168.1.7:8001/item/")
+    //   .then((res) => {
+    //     const filtered = res.data.filter(
+    //       (item) => item.data?.category?.toLowerCase() === "light"
+    //     );
+    //     setProducts(filtered);
+    //     setLoadingProducts(false);
+    //   })
+    //   .catch((err) => {
+    //     console.error("Error fetching products:", err);
+    //     setLoadingProducts(false);
+    //   });
+  }, []);
+  // fetch product
+  const fetchProduct = async()=>{
+    setLoadingProducts(true);
+    try {
+      const response = await getProductByIds(slug);
+      if(response.status===200){
+        setProducts(response.data)
+      }
+    } catch (error) {
+      console.log(error);
+      
+    }finally{
+      setLoadingProducts(false);
+    }
+  }
 
-  // Filters sidebar data
   const filters = [
     { label: "AVAILABILITY", options: ["In Stock", "Out of Stock", "Pre-Order"] },
     { label: "PRICE", options: ["Under ₹5000", "₹5000 - ₹10000", "₹10000 & Above"] },
@@ -55,21 +60,17 @@ export default function AllProductPage() {
     { label: "LENGTH", options: ["Under 2 feet", "2-4 feet", "4 feet & Above"] },
   ];
 
-  const products = productsData[slug] || [];
-
   return (
     <main className="max-w-7xl mx-auto px-4 pb-16 gap-8 relative pt-[140px]">
-      {/* FULLSCREEN LOADING SPINNER */}
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
           <div className="w-12 h-12 rounded-full border-t-4 border-b-4 border-orange-500 animate-spin"></div>
         </div>
       )}
 
-      {/* Heading */}
       <div className="fixed top-34 w-full border-b border-gray-300 z-30 bg-white">
         <h1 className="text-xs tracking-wide text-center py-2 uppercase">
-          {slug ? `${slug} PRODUCTS` : "PRODUCTS"}
+          Light Products
         </h1>
       </div>
 
@@ -95,39 +96,38 @@ export default function AllProductPage() {
 
         {/* Product Grid */}
         <section className="flex-1 pr-2">
-          {products.length > 0 ? (
+          {loadingProducts ? (
+            <p className="text-sm text-gray-500">Loading products...</p>
+          ) : products.length > 0 ? (
             <div>
-              <h2 className="text-lg font-semibold mb-4 capitalize">{slug} Products</h2>
+              {/* <h2 className="text-lg font-semibold mb-4 capitalize">Light Products</h2> */}
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {products.map((p) => (
                   <div
                     key={p.id}
                     className="p-4 relative hover:shadow transition rounded-md cursor-pointer group"
                     onClick={() => {
-                      setIsLoading(true); // Show loader
-                      router.push(`/allproduct/${p.name}`);
+                      setIsLoading(true);
+                      router.push(`/allproduct/${p.data.name}`);
                     }}
                   >
                     <div className="overflow-hidden rounded">
-                      <Image
-                        src={p.image}
-                        alt={p.name}
+                      <img
+                        src={p.image_url}
+                        alt={p.data.name}
                         width={180}
                         height={180}
                         className="object-cover w-full h-auto rounded transition-transform duration-300 ease-in-out group-hover:scale-105"
                       />
                     </div>
-                    <h2 className="mt-2 text-xs">{p.name}</h2>
-                    <p className="text-red-600 text-xs">{p.price}</p>
-                    <p className="line-through text-gray-500 text-[10px]">
-                      {p.oldPrice}
-                    </p>
+                    <h2 className="mt-2 text-xs">{p.data.name}</h2>
+                    <p className="text-red-600 text-xs">₹{p.data.price}</p>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No products found for this category.</p>
+            <p className="text-sm text-gray-500">No light products found.</p>
           )}
         </section>
       </div>

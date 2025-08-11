@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Upload, LoaderCircle, CheckCircle2 } from 'lucide-react';
-import { saveCategory, getCategory } from '@/service/apiCategory';
+import { saveCategory, getCategory, getCategoryById } from '@/service/apiCategory';
 
 export default function CreateCategoryPage() {
   const [formData, setFormData] = useState({
@@ -23,14 +23,14 @@ export default function CreateCategoryPage() {
   const [image, setImage] = useState<File | null>(null);
 
   const searchParams = useSearchParams();
-  const data = searchParams.get('data');
+  const id = searchParams.get('id');
   const router = useRouter();
 
   useEffect(() => {
-    if (data) {
+    if (id) {
       async function fetchCategoryData() {
         try {
-          const response = await getCategory();
+          const response = await getCategoryById(id);
           const category = response.data;
           setFormData({
             name: category.name || '',
@@ -42,8 +42,8 @@ export default function CreateCategoryPage() {
             metaKeyword: category.metaKeyword || '',
             metaDescription: category.metaDescription || '',
           });
-          if (category.thumbnail) {
-            setThumbnailUrl(category.thumbnail);
+          if (category.image) {
+            setThumbnailUrl(category.image);
           }
         } catch (error) {
           console.error('Error fetching category data:', error);
@@ -51,7 +51,7 @@ export default function CreateCategoryPage() {
       }
       fetchCategoryData();
     }
-  }, [data]);
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -125,7 +125,7 @@ export default function CreateCategoryPage() {
     <>
       <div className="p-8 bg-[#f9f7f7] min-h-screen space-y-8">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          {data ? 'Edit Category' : 'Create Category'}
+          {id ? 'Edit Category' : 'Create Category'}
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -159,7 +159,7 @@ export default function CreateCategoryPage() {
                 onClick={handleSave}
                 className="flex-1 border border-orange-500 text-orange-500 rounded-lg py-2 hover:bg-orange-50 cursor-pointer"
               >
-                {data ? 'Update Category' : 'Create Category'}
+                {id ? 'Update Category' : 'Create Category'}
               </button>
               <button
                 onClick={handleCancel}
@@ -276,7 +276,7 @@ export default function CreateCategoryPage() {
             className="border px-6 py-2 rounded-md border-gray-300 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
           >
             {loading && <LoaderCircle className="animate-spin" size={16} />}
-            {loading ? 'Saving...' : data ? 'Update Changes' : 'Save Change'}
+            {loading ? 'Saving...' : id ? 'Update Changes' : 'Save Change'}
           </button>
           <button
             onClick={handleCancel}

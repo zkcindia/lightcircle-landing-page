@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { getSubCategory } from "@/service/apiSubCategory";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function CategoriesSection() {
   const router = useRouter();
@@ -13,16 +14,14 @@ export default function CategoriesSection() {
   const [homeDecor, setHomeDecor] = useState([]);
   const [isLoading, setIsLoading] = useState(false); // 🔹 Added loading state
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await getSubCategory();
         if (res?.data) {
-          const apiData = res.data;
-          setCategories(apiData.filter(item => item.category === "light"));
-          setNewArrivals(apiData.filter(item => item.category === "fan"));
-          setHomeDecor(apiData.filter(item => item.category === "home-decor"));
-          setNamePlates(apiData.filter(item => item.category === "name-plate"));
+          const filtered = res.data.filter((cat) => cat.image);
+          setCategories(filtered);
         }
       } catch (error) {
         console.error("Error fetching subcategories:", error);
@@ -33,6 +32,7 @@ export default function CategoriesSection() {
 
   const handleClick = (slug) => {
     setIsLoading(true); // 🔹 Show loader
+    // axios.get('ulr',{form:{}})
     router.push(`/allproduct?slug=${slug}`);
   };
 
@@ -55,7 +55,7 @@ export default function CategoriesSection() {
         {categories.map((category, index) => (
           <div
             key={index}
-            onClick={() => handleClick("light")}
+            onClick={() => handleClick(category.slug)}
             className="relative flex items-end justify-center h-80 overflow-hidden cursor-pointer transition-transform duration-1000 ease-in-out hover:scale-105 rounded-lg shadow-md bg-[#D1B399]"
           >
             <img
@@ -83,7 +83,7 @@ export default function CategoriesSection() {
         {newArrivals.map((item, index) => (
           <div
             key={index}
-            onClick={() => handleClick("fan")}
+            onClick={() => handleClick(item?.slug)}
             className="relative flex items-end justify-center h-80 overflow-hidden cursor-pointer transition-transform duration-1000 ease-in-out hover:scale-105 rounded-lg shadow-md bg-[#D1B399]"
           >
             <img

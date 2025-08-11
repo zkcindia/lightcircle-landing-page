@@ -101,10 +101,10 @@ export default function Footer() {
 
       {/* Disclaimer */}
       <div className="max-w-6xl mx-auto mt-8 text-xs text-gray-500">
-        <p className="mb-4">
+        <p className="mb-4 text-justify">
           Disclaimer: The information contained in this website is for general
           information purposes only. The information is provided by
-          www.voylite.com, a property of Voylite Designs Private Limited. While
+          www.lightcircle.in, a property of Light Circle. While
           we endeavor to keep the information up to date and correct, we make no
           representations or warranties of any kind, express or implied, about
           the completeness, accuracy, reliability, suitability or availability

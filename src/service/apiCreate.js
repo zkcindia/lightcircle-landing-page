@@ -80,3 +80,8 @@ export async function getProductById(id) {
   return response;
 }
 
+// get product by id
+export const getProductByIds = async(slug)=>{
+  const response = await axios.get(`${URL}/item/${slug}/`);
+  return response;
+}
