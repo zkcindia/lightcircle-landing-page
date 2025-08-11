@@ -12,6 +12,7 @@ export default function page() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteSlug, setDeleteSlug] = useState(null);
   const router = useRouter();
+  const [isLoading,setIsLoading] = useState(false)
 
   useEffect(() => {
     fetchSubCategories();
