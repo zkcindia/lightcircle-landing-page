@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getCategory } from '@/service/apiCategory';
 import { useRouter } from 'next/navigation';
-import {saveSubCategory} from '@/service/apiSubCategory'
+import { saveSubCategory } from '@/service/apiSubCategory';
 import { Upload, LoaderCircle, CheckCircle2 } from 'lucide-react';
 
 export default function AddSubCategoryPage() {
@@ -11,7 +11,6 @@ export default function AddSubCategoryPage() {
   const [formData, setFormData] = useState({
     name: '',
     created_by: '',
-    // stock: '',
     tagId: '',
     description: '',
     parent_id: '',
@@ -46,7 +45,7 @@ export default function AddSubCategoryPage() {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-    setImageFile(file); // Store the actual file
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setThumbnailUrl(reader.result);
       reader.readAsDataURL(file);
@@ -69,21 +68,13 @@ export default function AddSubCategoryPage() {
 
     setLoading(true);
     try {
-     const formPayload = new FormData();
-
-formPayload.append('name', formData.name);
-formPayload.append('category', formData.parent_id);
-formPayload.append('created_by', formData.created_by);
-// formPayload.append('stock', formData.stock);
-formPayload.append('tagId', formData.tagId);
-formPayload.append('description', formData.description);
-
-// If thumbnailUrl is a file object (like from file input)
-formPayload.append('image', imageFile);
-
-// If it's just a URL string, use:
-// formPayload.append('image', thumbnailUrl); // if server expects URL string
-
+      const formPayload = new FormData();
+      formPayload.append('name', formData.name);
+      formPayload.append('category', formData.parent_id);
+      formPayload.append('created_by', formData.created_by);
+      formPayload.append('tagId', formData.tagId);
+      formPayload.append('description', formData.description);
+      formPayload.append('image', imageFile);
 
       const response = await saveSubCategory(formPayload);
 
@@ -105,7 +96,6 @@ formPayload.append('image', imageFile);
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Create Subcategory</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Left Card */}
         <div className="bg-white p-6 rounded-xl shadow-md col-span-1">
           <div className="flex justify-center mb-4">
             <img
@@ -134,20 +124,19 @@ formPayload.append('image', imageFile);
           <div className="mt-6 flex gap-4">
             <button
               onClick={handleSave}
-              className="flex-1 border border-blue-500 text-blue-500 rounded-xs py-2 hover:bg-blue-50 cursor-pointer"
+              className="flex-1 border border-orange-500 text-orange-500 rounded-lg py-2 hover:bg-orange-50 cursor-pointer"
             >
               Create Subcategory
             </button>
             <button
               onClick={handleCancel}
-              className="flex-1 bg-blue-500 text-white rounded-xs py-2 hover:bg-blue-600 cursor-pointer"
+              className="flex-1 bg-orange-500 text-white rounded-lg py-2 hover:bg-orange-600 cursor-pointer"
             >
               Cancel
             </button>
           </div>
         </div>
 
-        {/* Right Form */}
         <div className="bg-white p-6 rounded-xl shadow-md col-span-2">
           <h2 className="text-sm font-semibold text-gray-700 mb-4">Add Product Image</h2>
 
@@ -160,14 +149,14 @@ formPayload.append('image', imageFile);
 
           <div
             onClick={handleThumbnailClick}
-            className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center text-sm text-gray-600 cursor-pointer hover:border-blue-400 transition"
+            className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center text-sm text-gray-600 cursor-pointer hover:border-orange-400 transition"
           >
-            <div className="flex justify-center mb-2 text-blue-500">
+            <div className="flex justify-center mb-2 text-orange-500">
               <Upload size={24} />
             </div>
             <p>
               <span className="text-gray-700 font-medium">Drop your image here, or</span>{' '}
-              <span className="text-blue-500 font-semibold underline">click to browse</span>
+              <span className="text-orange-500 font-semibold underline">click to browse</span>
             </p>
             <p className="text-xs text-gray-400 mt-1">
               1600 x 1200 recommended. PNG, JPG, GIF allowed.
@@ -183,7 +172,6 @@ formPayload.append('image', imageFile);
         </div>
       </div>
 
-      {/* General Info */}
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-sm font-semibold text-gray-700 mb-4">General Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -195,7 +183,7 @@ formPayload.append('image', imageFile);
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter Title"
-              className="w-full border border-gray-300 rounded-xs px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-xs px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
 
@@ -205,7 +193,7 @@ formPayload.append('image', imageFile);
               name="parent_id"
               value={formData.parent_id}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-xs px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-xs px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
             >
               <option value="">Select Parent Category</option>
               {categories.map((cat) => (
@@ -222,7 +210,7 @@ formPayload.append('image', imageFile);
               name="created_by"
               value={formData.created_by}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-xs px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-xs px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
             >
               <option value="">Select Creator</option>
               <option value="Seller">Seller</option>
@@ -230,18 +218,6 @@ formPayload.append('image', imageFile);
               <option value="Other">Other</option>
             </select>
           </div>
-
-          {/* <div>
-            <label className="text-sm font-medium text-gray-600 block mb-1">Stock</label>
-            <input
-              type="number"
-              name="stock"
-              value={formData.stock}
-              onChange={handleChange}
-              placeholder="Quantity"
-              className="w-full border border-gray-300 rounded-xs px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div> */}
 
           <div>
             <label className="text-sm font-medium text-gray-600 block mb-1">Tag ID</label>
@@ -251,7 +227,7 @@ formPayload.append('image', imageFile);
               value={formData.tagId}
               onChange={handleChange}
               placeholder="######"
-              className="w-full border border-gray-300 rounded-xs px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-xs px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
 
@@ -263,13 +239,12 @@ formPayload.append('image', imageFile);
               onChange={handleChange}
               rows={4}
               placeholder="Type description"
-              className="w-full border border-gray-300 rounded-xs px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-xs px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
         </div>
       </div>
 
-      {/* Bottom Buttons */}
       <div className="flex justify-end mt-6 gap-4 bg-[#f1f4f9] p-4 rounded-lg">
         <button
           onClick={handleSave}
@@ -281,11 +256,18 @@ formPayload.append('image', imageFile);
         </button>
         <button
           onClick={handleCancel}
-          className="bg-blue-500 px-6 py-2 rounded-xs text-sm text-white hover:bg-blue-600 cursor-pointer"
+          className="bg-orange-500 px-6 py-2 rounded-xs text-sm text-white hover:bg-orange-600 cursor-pointer"
         >
           Cancel
         </button>
       </div>
+
+      {/* ✅ FULLSCREEN LOADING SPINNER */}
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+          <div className="w-12 h-12 rounded-full border-t-4 border-b-4 border-orange-500 animate-spin"></div>
+        </div>
+      )}
     </div>
   );
 }

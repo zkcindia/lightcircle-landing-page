@@ -12,6 +12,7 @@ export default function ProductPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // <-- Spinner state
 
   const months = ["This Month", "Last Month", "Last 3 Months", "Last 6 Months"];
 
@@ -35,17 +36,28 @@ export default function ProductPage() {
   const confirmDelete = async () => {
     if (deleteTarget) {
       setIsDeleting(true);
+      setIsLoading(true);
       try {
         await deleteProduct(deleteTarget);
         setProducts(products.filter((item) => item.id !== deleteTarget));
       } catch (error) {
         console.error("Delete failed:", error);
       } finally {
-        setIsDeleting(false);
-        setShowDeleteModal(false);
-        setDeleteTarget(null);
+        setTimeout(() => {
+          setIsDeleting(false);
+          setShowDeleteModal(false);
+          setDeleteTarget(null);
+          setIsLoading(false);
+        }, 1000); // Simulate delay for 1 second
       }
     }
+  };
+
+  const handleEditClick = (id) => {
+    setIsLoading(true);
+    setTimeout(() => {
+      router.push(`/admin/product/create?id=${id}`);
+    }, 1000); // Delay for 1 second to show spinner
   };
 
   return (
@@ -55,7 +67,12 @@ export default function ProductPage() {
           <h2 className="text-lg font-semibold">All Product List</h2>
           <div className="flex gap-2 relative">
             <button
-              onClick={() => router.push("/admin/product/create")}
+              onClick={() => {
+                setIsLoading(true);
+                setTimeout(() => {
+                  router.push("/admin/product/create");
+                }, 1000);
+              }}
               className="bg-[#ff5d2c] hover:bg-[#ff3d00] text-white px-4 py-2 rounded-md font-medium cursor-pointer"
             >
               Add Product
@@ -141,7 +158,7 @@ export default function ProductPage() {
                       <div className="flex items-center gap-2">
                         <div
                           className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
-                          onClick={() => router.push(`/admin/product/create?id=${item.id}`)}
+                          onClick={() => handleEditClick(item.id)}
                         >
                           <Pencil className="w-4 h-4 text-[#ff5d2c]" />
                         </div>
@@ -205,6 +222,13 @@ export default function ProductPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* FULLSCREEN LOADING SPINNER */}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+          <div className="w-12 h-12 rounded-full border-t-4 border-b-4 border-orange-500 animate-spin"></div>
         </div>
       )}
     </section>

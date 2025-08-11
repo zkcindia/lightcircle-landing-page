@@ -100,3 +100,4 @@ export async function getProductById(id) {
     throw error;
   }
 }
+

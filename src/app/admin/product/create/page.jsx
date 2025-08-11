@@ -4,6 +4,10 @@ import { Upload, Trash2 } from 'lucide-react';
 import { createProduct } from '@/service/apiCreate';
 import { getCategory } from '@/service/apiCategory';
 import { getSubCategoryById } from '@/service/apiSubCategory';
+import { useSearchParams } from 'next/navigation';
+import { getProductById } from '@/service/apiCreate'; // 👈 you must implement this
+import { editProduct } from '@/service/apiCreate';
+
 
 export default function CreateProductPage() {
   const [productImage, setProductImage] = useState(null);
@@ -11,6 +15,120 @@ export default function CreateProductPage() {
   const [Category, setCategory] = useState([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const searchParams = useSearchParams();
+const editId = searchParams.get("id");
+
+useEffect(() => {
+  if (editId) {
+    fetchProductData(editId);
+  }
+}, [editId]);
+
+// const fetchProductData = async (id) => {
+//   try {
+//     const res = await getProductById(id); // 👈 must return a single product
+//     const { data } = res;
+
+//     // set form fields
+//     setFormData({
+//       name: data.name || '',
+//       category: data.category || '',
+//       subcategory: data.parent_category_slug || '',
+//       brand: data.brand || '',
+//       weight: data.weight || '',
+//       description: data.description || '',
+//       tag_no: data.tag_no || '',
+//       stock: data.stock || '',
+//       tag: data.tag || '',
+//       price: data.price || '',
+//       discount: data.discount || '',
+//       tax: data.tax || '',
+//     });
+//     const handleSubmit = async () => {
+//   const form = new FormData();
+//   const dataPayload = {
+//     ...formData,
+//     attributes,
+//   };
+//   form.append('data', JSON.stringify(dataPayload));
+//   form.append('parent_category_slug', formData.subcategory);
+//   if (productImage) {
+//     form.append('image', productImage);
+//   }
+
+//   try {
+//     if (editId) {
+//       await editProduct(editId, form); // 👈 your edit API
+//     } else {
+//       await createProduct(form);
+//     }
+//     setShowSuccessModal(true);
+//   } catch (error) {
+//     console.error("Error submitting product:", error);
+//     setShowErrorModal(true);
+//   }
+// };
+
+//     // attributes
+//     setAttributes(data.attributes || [{ key: '', value: '' }]);
+
+//     // image
+//     if (data.image_url) {
+//       const imageBlob = await fetch(data.image_url).then(res => res.blob());
+//       const file = new File([imageBlob], "product-image.jpg", { type: imageBlob.type });
+//       setProductImage(file);
+//     }
+
+//     // fetch subcategory if needed
+//     if (data.category) {
+//       await fetchSubcategory(data.category);
+//     }
+
+//   } catch (error) {
+//     console.error("Failed to fetch product:", error);
+//   }
+// };
+const fetchProductData = async (id) => {
+  try {
+    const res = await getProductById(id);
+    const product = res.data;
+
+    const details = product.data || {};
+
+    setFormData({
+      name: details.name || '',
+      category: details.category || '',
+      subcategory: product.parent_category_slug || '',
+      brand: details.brand || '',
+      weight: details.weight || '',
+      description: details.description || '',
+      tag_no: details.tag_no || '',
+      stock: details.stock || '',
+      tag: details.tag || '',
+      price: details.price || '',
+      discount: details.discount || '',
+      tax: details.tax || '',
+    });
+
+    setAttributes(details.attributes || [{ key: '', value: '' }]);
+
+    // Handle image
+    if (product.image_url) {
+      const imageBlob = await fetch(product.image_url).then(res => res.blob());
+      const file = new File([imageBlob], "product-image.jpg", { type: imageBlob.type });
+      setProductImage(file);
+    }
+
+    // Fetch subcategories
+    if (details.category) {
+      await fetchSubcategory(details.category);
+    }
+
+  } catch (error) {
+    console.error("Failed to fetch product:", error);
+  }
+};
+
 
 
   const [subcategory, setSubcategory] = useState([]);
