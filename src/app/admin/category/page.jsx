@@ -35,7 +35,7 @@ export default function CategoryPage() {
     }
   };
 
-  const handleDelete = async (id:any) => {
+  const handleDelete = async (id) => {
     try {
       const response = await deleteCategory(id);
       if (response.status === 204) {

@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Upload, LoaderCircle, CheckCircle2 } from 'lucide-react';
 import { saveCategory, getCategory } from '@/service/apiCategory';
 
-export default function CreateCategoryPage() {
+export default function AddCategoryClient() {
   const [formData, setFormData] = useState({
     name: '',
     created_by: '',
@@ -16,11 +16,11 @@ export default function CreateCategoryPage() {
     metaKeyword: '',
     metaDescription: '',
   });
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [image, setImage] = useState<File | null>(null);
+  const fileInputRef = useRef(null);
+  const [image, setImage] = useState(null);
 
 
   const searchParams = useSearchParams();
@@ -56,9 +56,7 @@ export default function CreateCategoryPage() {
 }, [data]);
 
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -113,13 +111,13 @@ export default function CreateCategoryPage() {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       setImage(file)
       const reader = new FileReader();
       reader.onloadend = () => {
-        setThumbnailUrl(reader.result as string);
+        setThumbnailUrl(reader.result);
         setSuccessMessage('Product image uploaded successfully!');
         setTimeout(() => setSuccessMessage(''), 3000);
       };

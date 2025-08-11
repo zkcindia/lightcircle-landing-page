@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import {handleLogin} from './../../service/apiAuth'
 import { useRouter } from "next/navigation";
@@ -31,7 +30,7 @@ export default function SignupPage() {
         password:password
       }
       const response = await handleLogin(data);
-      if(response.status){
+      if(response.status===200){ 
          localStorage.setItem("token", JSON.stringify(response.data));
         router.push('/admin')
       }

@@ -3,11 +3,18 @@ import axios from "axios";
 const URL = process.env.NEXT_PUBLIC_API_URL;
 console.log(URL);
 
-const tokenData = localStorage.getItem("token");
-const token = JSON.parse(tokenData);
+// ✅ Helper to safely get token only in the browser
+function getToken() {
+  if (typeof window === "undefined") return null; // Prevent SSR crash
+  const tokenData = localStorage.getItem("token");
+  return tokenData ? JSON.parse(tokenData) : null;
+}
 
 // CREATE PRODUCT
 export async function createProduct(data) {
+  const token = getToken();
+  if (!token) throw new Error("No token found");
+
   try {
     const response = await axios.post(`${URL}/item/`, data, {
       headers: {
@@ -23,6 +30,9 @@ export async function createProduct(data) {
 
 // GET ALL PRODUCTS
 export async function getAllProducts() {
+  const token = getToken();
+  if (!token) throw new Error("No token found");
+
   try {
     const response = await axios.get(`${URL}/item/`, {
       headers: {
@@ -36,14 +46,15 @@ export async function getAllProducts() {
   }
 }
 
-// ✅ DELETE PRODUCT BY ID
+// DELETE PRODUCT BY ID
 export async function deleteProduct(productId) {
-  const token = JSON.parse(localStorage.getItem("token"));
+  const token = getToken();
+  if (!token) throw new Error("No token found");
 
   try {
     const response = await axios.delete(`${URL}/item/${productId}/`, {
       headers: {
-        Authorization: `Bearer ${token?.access}`,
+        Authorization: `Bearer ${token.access}`,
       },
     });
     return response;
@@ -53,14 +64,16 @@ export async function deleteProduct(productId) {
   }
 }
 
-// ✅ EDIT (UPDATE) PRODUCT BY ID
+// EDIT PRODUCT BY ID
 export async function editProduct(productId, updatedData) {
-  const token = JSON.parse(localStorage.getItem("token"));
+  const token = getToken();
+  if (!token) throw new Error("No token found");
+
   try {
     const response = await axios.put(`${URL}/item/${productId}/`, updatedData, {
       headers: {
-        Authorization: `Bearer ${token?.access}`,
-        "Content-Type": "multipart/form-data", // Required if using FormData
+        Authorization: `Bearer ${token.access}`,
+        "Content-Type": "multipart/form-data",
       },
     });
     return response;
@@ -69,13 +82,21 @@ export async function editProduct(productId, updatedData) {
     throw error;
   }
 }
-// Get product by ID
+
+// GET PRODUCT BY ID
 export async function getProductById(id) {
-  const token = JSON.parse(localStorage.getItem("token"));
-  const response = await axios.get(`${URL}/item/${id}/`, {
-    headers: {
-      Authorization: `Bearer ${token?.access}`,
-    },
-  });
-  return response;
+  const token = getToken();
+  if (!token) throw new Error("No token found");
+
+  try {
+    const response = await axios.get(`${URL}/item/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${token.access}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error(`Error fetching product with ID ${id}:`, error);
+    throw error;
+  }
 }

@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Upload, Trash2 } from 'lucide-react';
 import { createProduct } from '@/service/apiCreate';

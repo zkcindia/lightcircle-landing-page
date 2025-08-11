@@ -10,7 +10,7 @@ import 'antd/dist/reset.css';
 export default function page() {
   const [subCategories, setSubCategories] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteSlug, setDeleteSlug] = useState<string | null>(null);
+  const [deleteSlug, setDeleteSlug] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function page() {
     }
   };
 
-  const handleDelete = async (slug: string | null) => {
+  const handleDelete = async (slug) => {
     if (!slug) return;
 
     try {
@@ -44,7 +44,7 @@ export default function page() {
     }
   };
 
-  const openDeleteModal = (slug: string) => {
+  const openDeleteModal = (slug) => {
     setDeleteSlug(slug);
     setIsDeleteModalOpen(true);
   };

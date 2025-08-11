@@ -3,38 +3,44 @@ import axios from "axios";
 const URL = process.env.NEXT_PUBLIC_API_URL;
 console.log(URL);
 
-// fetch sub category
-export const getSubCategory = async()=>{
-     const tokenData = localStorage.getItem("token");
-  const token = JSON.parse(tokenData);
-    
- const responce = await axios.get(`${URL}/subcategory-parent/`,{
-     headers: {
-      Authorization: `Bearer ${token.access}`,
-    },
- })
- return responce;
+// ✅ Helper to get token safely (browser only)
+function getToken() {
+  if (typeof window === "undefined") return null; // SSR safety
+  const tokenData = localStorage.getItem("token");
+  return tokenData ? JSON.parse(tokenData) : null;
 }
 
-// add subCategory
-export const saveSubCategory = async(formData)=>{
-    const tokenData = localStorage.getItem("token");
-  const token = JSON.parse(tokenData);
+// ✅ Fetch sub category
+export async function getSubCategory() {
+  const token = getToken();
+  if (!token) throw new Error("No token found");
 
- const response = await axios.post(`${URL}/subcategory-parent/`, formData, {
+  const response = await axios.get(`${URL}/subcategory-parent/`, {
     headers: {
       Authorization: `Bearer ${token.access}`,
-      'Content-Type': 'multipart/form-data',
     },
   });
   return response;
 }
 
+// ✅ Add subCategory
+export async function saveSubCategory(formData) {
+  const token = getToken();
+  if (!token) throw new Error("No token found");
 
-// delete subcategory
-export const deleteSubCategory = async (id) => {
-  const tokenData = localStorage.getItem("token");
-  const token = JSON.parse(tokenData);
+  const response = await axios.post(`${URL}/subcategory-parent/`, formData, {
+    headers: {
+      Authorization: `Bearer ${token.access}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response;
+}
+
+// ✅ Delete subcategory
+export async function deleteSubCategory(id) {
+  const token = getToken();
+  if (!token) throw new Error("No token found");
 
   const response = await axios.delete(`${URL}/subcategory-parent/${id}/`, {
     headers: {
@@ -42,16 +48,12 @@ export const deleteSubCategory = async (id) => {
     },
   });
   return response;
-};
+}
 
-
-// sub category by id .
-
-
-export const getSubCategoryById = async (id) => {
-  const tokenData = localStorage.getItem("token");
-  const token = JSON.parse(tokenData);
-console.log('call',URL);
+// ✅ Get sub category by ID
+export async function getSubCategoryById(id) {
+  const token = getToken();
+  if (!token) throw new Error("No token found");
 
   const response = await axios.get(`${URL}/category/sub/${id}/`, {
     headers: {
@@ -59,4 +61,4 @@ console.log('call',URL);
     },
   });
   return response;
-};
+}

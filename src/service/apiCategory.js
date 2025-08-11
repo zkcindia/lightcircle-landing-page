@@ -2,10 +2,16 @@ import axios from "axios";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
+function getToken() {
+  if (typeof window === "undefined") return null; // ⬅ Skip if on server
+  const tokenData = localStorage.getItem("token");
+  return tokenData ? JSON.parse(tokenData) : null;
+}
+
 // ✅ Save a new category
 export const saveCategory = async (formData) => {
-  const tokenData = localStorage.getItem("token");
-  const token = JSON.parse(tokenData);
+  const token = getToken();
+  if (!token) throw new Error("No token found");
 
   const res = await axios.post(`${URL}/category/`, formData, {
     headers: {
@@ -18,9 +24,9 @@ export const saveCategory = async (formData) => {
 
 // ✅ Get all categories
 export const getCategory = async () => {
-  const tokenData = localStorage.getItem("token");
-  const token = JSON.parse(tokenData);
-  
+  const token = getToken();
+  if (!token) throw new Error("No token found");
+
   const res = await axios.get(`${URL}/category/`, {
     headers: {
       Authorization: `Bearer ${token.access}`,
@@ -31,8 +37,8 @@ export const getCategory = async () => {
 
 // ✅ Delete a category
 export const deleteCategory = async (id) => {
-  const tokenData = localStorage.getItem("token");
-  const token = JSON.parse(tokenData);
+  const token = getToken();
+  if (!token) throw new Error("No token found");
 
   const res = await axios.delete(`${URL}/category/${id}/`, {
     headers: {
@@ -44,8 +50,8 @@ export const deleteCategory = async (id) => {
 
 // ✅ Edit/Update an existing category
 export const editCategory = async (id, formData) => {
-  const tokenData = localStorage.getItem("token");
-  const token = JSON.parse(tokenData);
+  const token = getToken();
+  if (!token) throw new Error("No token found");
 
   const res = await axios.put(`${URL}/category/${id}/`, formData, {
     headers: {
