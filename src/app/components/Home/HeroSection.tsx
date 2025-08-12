@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation"; // 🔹 Added import
 
 export default function HeroSection() {
   const images = [
-    "/images/bg1.jpg",
-    "/images/bg6.avif",
-    "/images/bg2.jpg",
-    "/images/bg3.jpg",
-    "/images/bg11.avif",
+    "/images/bg09.png",
+    "/images/bg08.png",
+    "/images/bg07.png",
+    "/images/bg06.png",
+    // "/images/bg11.avif",
   ];
 
   const [current, setCurrent] = useState(0);
