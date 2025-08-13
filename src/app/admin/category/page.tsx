@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import {  Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Modal, message } from 'antd';
 import { getCategory, deleteCategory } from '@/service/apiCategory';
 
@@ -20,6 +20,10 @@ export default function CategoryPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteSlug, setDeleteSlug] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // Spinner state
+
+  // ✅ Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetchCategory();
@@ -39,7 +43,7 @@ export default function CategoryPage() {
     }
   };
 
-  const handleDelete = async (id: any) => {
+  const handleDelete = async (id) => {
     try {
       setIsLoading(true);
       const response = await deleteCategory(id);
@@ -57,11 +61,11 @@ export default function CategoryPage() {
     }
   };
 
-  const handleEdit = (id: any) => {
+  const handleEdit = (id) => {
     setIsLoading(true);
     setTimeout(() => {
       router.push(`/admin/category/addcategory?id=${id}`);
-    }, 300); // Small delay for UX
+    }, 300);
   };
 
   const handleAddCategory = () => {
@@ -77,6 +81,17 @@ export default function CategoryPage() {
     { label: 'Export', value: 'Export' },
     { label: 'Import', value: 'Import' },
   ];
+
+  // ✅ Pagination logic
+  const totalPages = Math.ceil(categoryRows.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = categoryRows.slice(startIndex, startIndex + itemsPerPage);
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <main className="min-h-screen p-8 bg-gray-50 cursor-crosshair">
@@ -140,7 +155,7 @@ export default function CategoryPage() {
               </tr>
             </thead>
             <tbody>
-              {categoryRows.map((row, index) => (
+              {currentData.map((row, index) => (
                 <tr key={index} className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer">
                   <td className="px-4 py-2"><input type="checkbox" /></td>
                   <td className="px-4 py-2 flex items-center gap-2">
@@ -156,9 +171,6 @@ export default function CategoryPage() {
                   <td className="px-4 py-2">{row.id}</td>
                   <td className="px-4 py-2">{row.quantity || 0}</td>
                   <td className="px-4 py-2 flex gap-2">
-                    {/* <div className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
-                      <Eye className="w-4 h-4 text-[#ff5d2c]" />
-                    </div> */}
                     <div
                       className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer"
                       onClick={() => handleEdit(row.slug)}
@@ -173,7 +185,7 @@ export default function CategoryPage() {
                           setDeleteSlug(row.slug);
                           setIsDeleteModalOpen(true);
                           setIsLoading(false);
-                        }, 200); // slight delay to show the spinner
+                        }, 200);
                       }}
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
@@ -185,16 +197,55 @@ export default function CategoryPage() {
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="flex justify-end mt-6">
-          <div className="inline-flex items-center space-x-1 border border-gray-200 rounded-md overflow-hidden">
-            <button className="px-3 py-1 text-sm text-blue-700 hover:bg-gray-200 cursor-pointer">Previous</button>
-            <button className="px-3 py-1 text-sm bg-orange-500 text-white cursor-pointer">1</button>
-            <button className="px-3 py-1 text-sm text-blue-700 hover:bg-gray-200 cursor-pointer">2</button>
-            <button className="px-3 py-1 text-sm text-blue-700 hover:bg-gray-200 cursor-pointer">3</button>
-            <button className="px-3 py-1 text-sm text-blue-700 hover:bg-gray-200 cursor-pointer">Next</button>
-          </div>
-        </div>
+        {/* ✅ Updated Pagination (Styled like image with hover pointer) */}
+<div className="flex justify-end mt-6">
+  <div className="flex items-center gap-2">
+    {/* Previous Button */}
+    <button
+      className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors duration-200 ${
+        currentPage === 1
+          ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+          : 'border-gray-300 text-black hover:bg-gray-200 hover:cursor-pointer'
+      }`}
+      onClick={() => goToPage(currentPage - 1)}
+      disabled={currentPage === 1}
+    >
+      &lt;
+    </button>
+
+    {/* Page Numbers */}
+    {[...Array(totalPages)].map((_, index) => {
+      const pageNum = index + 1;
+      return (
+        <button
+          key={pageNum}
+          className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors duration-200 ${
+            currentPage === pageNum
+              ? 'bg-orange-500 text-white border-orange-500 hover:cursor-pointer'
+              : 'border-gray-300 text-black hover:bg-gray-200 hover:cursor-pointer'
+          }`}
+          onClick={() => goToPage(pageNum)}
+        >
+          {pageNum}
+        </button>
+      );
+    })}
+
+    {/* Next Button */}
+    <button
+      className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors duration-200 ${
+        currentPage === totalPages
+          ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+          : 'border-gray-300 text-black hover:bg-gray-200 hover:cursor-pointer'
+      }`}
+      onClick={() => goToPage(currentPage + 1)}
+      disabled={currentPage === totalPages}
+    >
+      &gt;
+    </button>
+  </div>
+</div>
+
       </div>
 
       {/* Centered Delete Modal */}

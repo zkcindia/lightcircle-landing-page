@@ -12,6 +12,12 @@ export default function page() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteSlug, setDeleteSlug] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false); // 👈 loading state added
+
+  // ✅ Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(subCategories.length / itemsPerPage);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -55,6 +61,18 @@ export default function page() {
     setIsDeleteModalOpen(true);
   };
 
+  // ✅ Pagination handler
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  // ✅ Get current page's data
+  const paginatedData = subCategories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <main className="min-h-screen p-8 bg-gray-50">
       {/* 👇 Fullscreen Spinner Overlay */}
@@ -90,16 +108,13 @@ export default function page() {
               </tr>
             </thead>
             <tbody>
-              {subCategories.map((sub, index) => (
+              {paginatedData.map((sub, index) => (
                 <tr key={sub.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-4 py-2">{index + 1}</td>
+                  <td className="px-4 py-2">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                   <td className="px-4 py-2">{sub.name}</td>
                   <td className="px-4 py-2">{sub.category}</td>
                   <td className="px-4 py-2">{sub.created_by}</td>
                   <td className="px-4 py-2 flex gap-2">
-                    {/* <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
-                      <Eye className="w-4 h-4 text-[#ff5d2c]" />
-                    </button> */}
                     <button
                       onClick={() => {
                         setIsLoading(true);
@@ -128,6 +143,56 @@ export default function page() {
             </tbody>
           </table>
         </div>
+
+        {/* ✅ Updated Pagination (Styled like image with hover pointer) */}
+<div className="flex justify-end mt-6">
+  <div className="flex items-center gap-2">
+    {/* Previous Button */}
+    <button
+      className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors duration-200 ${
+        currentPage === 1
+          ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+          : 'border-gray-300 text-black hover:bg-gray-200 hover:cursor-pointer'
+      }`}
+      onClick={() => goToPage(currentPage - 1)}
+      disabled={currentPage === 1}
+    >
+      &lt;
+    </button>
+
+    {/* Page Numbers */}
+    {[...Array(totalPages)].map((_, index) => {
+      const pageNum = index + 1;
+      return (
+        <button
+          key={pageNum}
+          className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors duration-200 ${
+            currentPage === pageNum
+              ? 'bg-orange-500 text-white border-orange-500 hover:cursor-pointer'
+              : 'border-gray-300 text-black hover:bg-gray-200 hover:cursor-pointer'
+          }`}
+          onClick={() => goToPage(pageNum)}
+        >
+          {pageNum}
+        </button>
+      );
+    })}
+
+    {/* Next Button */}
+    <button
+      className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors duration-200 ${
+        currentPage === totalPages
+          ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+          : 'border-gray-300 text-black hover:bg-gray-200 hover:cursor-pointer'
+      }`}
+      onClick={() => goToPage(currentPage + 1)}
+      disabled={currentPage === totalPages}
+    >
+      &gt;
+    </button>
+  </div>
+</div>
+
       </div>
 
       {/* ✅ Centered Delete Modal */}

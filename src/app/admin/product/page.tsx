@@ -17,6 +17,10 @@ export default function ProductPage() {
 
   const months = ["This Month", "Last Month", "Last 3 Months", "Last 6 Months"];
 
+  // ✅ Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -59,6 +63,17 @@ export default function ProductPage() {
     setTimeout(() => {
       router.push(`/admin/product/create?id=${id}`);
     }, 1000); // Delay for 1 second to show spinner
+  };
+
+  // ✅ Pagination logic
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentProducts = products.slice(startIndex, startIndex + itemsPerPage);
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
@@ -120,7 +135,7 @@ export default function ProductPage() {
               </tr>
             </thead>
             <tbody className="text-sm">
-              {products.map((item, index) => {
+              {currentProducts.map((item, index) => {
                 const product = item.data || {};
                 return (
                   <tr
@@ -150,7 +165,9 @@ export default function ProductPage() {
                     </td>
                     <td className="py-4">
                       <p>{product.stock || 0} Item Left</p>
-                      <p className="text-gray-500 text-xs">{product.sold || 0} Sold</p>
+                      <p className="text-gray-500 text-xs">
+                        {product.sold || 0} Sold
+                      </p>
                     </td>
                     <td className="py-4">
                       {product.category || item?.parent_category_slug || "-"}
@@ -178,16 +195,54 @@ export default function ProductPage() {
           </table>
         </div>
 
-        {/* PAGINATION */}
-        <div className="flex justify-end mt-6">
-          <div className="inline-flex items-center space-x-1 border rounded-md overflow-hidden">
-            <button className="px-3 py-1 text-sm text-blue-700 hover:bg-gray-200 cursor-pointer">Previous</button>
-            <button className="px-3 py-1 text-sm bg-orange-500 text-white cursor-pointer">1</button>
-            <button className="px-3 py-1 text-sm text-blue-700 hover:bg-gray-200 cursor-pointer">2</button>
-            <button className="px-3 py-1 text-sm text-blue-700 hover:bg-gray-200 cursor-pointer">3</button>
-            <button className="px-3 py-1 text-sm text-blue-700 hover:bg-gray-200 cursor-pointer">Next</button>
-          </div>
-        </div>
+                {/* ✅ Updated Pagination (Styled like image with hover pointer) */}
+<div className="flex justify-end mt-6">
+  <div className="flex items-center gap-2">
+    {/* Previous Button */}
+    <button
+      className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors duration-200 ${
+        currentPage === 1
+          ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+          : 'border-gray-300 text-black hover:bg-gray-200 hover:cursor-pointer'
+      }`}
+      onClick={() => goToPage(currentPage - 1)}
+      disabled={currentPage === 1}
+    >
+      &lt;
+    </button>
+
+    {/* Page Numbers */}
+    {[...Array(totalPages)].map((_, index) => {
+      const pageNum = index + 1;
+      return (
+        <button
+          key={pageNum}
+          className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors duration-200 ${
+            currentPage === pageNum
+              ? 'bg-orange-500 text-white border-orange-500 hover:cursor-pointer'
+              : 'border-gray-300 text-black hover:bg-gray-200 hover:cursor-pointer'
+          }`}
+          onClick={() => goToPage(pageNum)}
+        >
+          {pageNum}
+        </button>
+      );
+    })}
+
+    {/* Next Button */}
+    <button
+      className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors duration-200 ${
+        currentPage === totalPages
+          ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+          : 'border-gray-300 text-black hover:bg-gray-200 hover:cursor-pointer'
+      }`}
+      onClick={() => goToPage(currentPage + 1)}
+      disabled={currentPage === totalPages}
+    >
+      &gt;
+    </button>
+  </div>
+</div>
       </div>
 
       {/* DELETE CONFIRMATION MODAL */}
@@ -205,7 +260,9 @@ export default function ProductPage() {
             <h3 className="text-lg font-semibold mb-2">
               Are you sure to delete this product?
             </h3>
-            <p className="text-sm text-gray-600 mb-4">This action cannot be undone.</p>
+            <p className="text-sm text-gray-600 mb-4">
+              This action cannot be undone.
+            </p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowDeleteModal(false)}

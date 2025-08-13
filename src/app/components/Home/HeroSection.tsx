@@ -7,9 +7,9 @@ export default function HeroSection() {
   const images = [
     "/images/bg09.png",
     "/images/bg08.png",
-    "/images/bg07.png",
     "/images/bg06.png",
     "/images/bg05.png",
+    "/images/bg07.png",
   ];
 
   const [current, setCurrent] = useState(0);
