@@ -4,19 +4,15 @@ import React, { useEffect, useState } from "react";
 import { getSubCategory } from "@/service/apiSubCategory";
 import { getCategory } from "@/service/apiCategory";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 
 export default function CategoriesSection() {
   const router = useRouter();
 
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
-  const [newArrivals, setNewArrivals] = useState([]);
-  const [namePlates, setNamePlates] = useState([]);
-  const [homeDecor, setHomeDecor] = useState([]);
-  const [isLoading, setIsLoading] = useState(false); //  Added loading state
+  const [isLoading, setIsLoading] = useState(false);
 
-
+  // Fetch subcategories
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,34 +28,29 @@ export default function CategoriesSection() {
     fetchData();
   }, []);
 
-  // fetch category
-
+  // Fetch categories
   useEffect(() => {
-  const fetchCategories = async () => {
-    try {
-      const categoryRes = await getCategory();
-      if (categoryRes?.data) {
-        const filteredCategories = categoryRes.data.filter((cat) => cat.image);
-        setCategories(filteredCategories);
+    const fetchCategories = async () => {
+      try {
+        const categoryRes = await getCategory();
+        if (categoryRes?.data) {
+          const filteredCategories = categoryRes.data.filter((cat) => cat.image);
+          setCategories(filteredCategories);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
       }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  fetchCategories();
-}, []);
-
-
+    };
+    fetchCategories();
+  }, []);
 
   const handleClick = (slug) => {
-    setIsLoading(true); // 🔹 Show loader
-    // axios.get('ulr',{form:{}})
+    setIsLoading(true);
     router.push(`/allproduct?slug=${slug}`);
   };
 
   return (
-     <section className="w-full bg-white py-12">
+    <section className="w-full bg-white py-12">
       {/* Loading Spinner */}
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
@@ -68,27 +59,37 @@ export default function CategoriesSection() {
       )}
 
       {categories.map((category, idx) => {
-        // Match subcategories for this category
         const matchedSubCats = subCategories.filter(
-          (sub) => sub.category === category.slug || sub.category === category.name.toLowerCase()
+          (sub) =>
+            sub.category === category.slug ||
+            sub.category === category.name.toLowerCase()
         );
 
-        if (matchedSubCats.length === 0) return null; // skip if no match
+        if (matchedSubCats.length === 0) return null;
 
         return (
-          <div key={idx} id={`${category.slug}-section`} className="scroll-mt-32 py-12">
+          <div
+            key={idx}
+            id={`${category.slug}-section`}
+            className="scroll-mt-32 py-12"
+          >
             {/* Heading */}
             <h2 className="text-3xl font-light text-center text-black mb-8">
               EXPLORE <span className="font-bold">OUR {category.name}</span>
             </h2>
 
-            {/* Subcategory grid */}
-            <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 px-4">
+            {/* Grid - always consistent size, good wrapping */}
+            <div
+              className={`max-w-6xl mx-auto grid gap-8 px-4 place-items-center`}
+              style={{
+                gridTemplateColumns: `repeat(auto-fit, minmax(18rem, 1fr))`,
+              }}
+            >
               {matchedSubCats.map((subCat, subIdx) => (
                 <div
                   key={subIdx}
                   onClick={() => handleClick(subCat.slug)}
-                  className="relative flex items-end justify-center h-80 overflow-hidden cursor-pointer transition-transform duration-1000 ease-in-out hover:scale-105 rounded-lg shadow-md bg-[#D1B399]"
+                  className="relative flex items-end justify-center w-72 h-80 overflow-hidden cursor-pointer transition-transform duration-1000 ease-in-out hover:scale-105 rounded-lg shadow-md bg-[#D1B399]"
                 >
                   <img
                     src={subCat.image}

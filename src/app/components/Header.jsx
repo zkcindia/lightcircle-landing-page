@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Phone, MessageCircle, User, Menu, ChevronDown } from "lucide-react";
+import { Phone, User, Menu, ChevronDown } from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
+
 import { usePathname, useRouter } from "next/navigation";
 import { Dropdown } from "antd";
 import { getCategory } from "@/service/apiCategory";
@@ -22,7 +24,7 @@ export default function Header() {
 
   const router = useRouter();
   const pathname = usePathname();
-    const handleWhatsAppClick = () => {
+  const handleWhatsAppClick = () => {
     window.open("https://wa.me/919876543210", "_blank"); // ✅ Change number to your WhatsApp
   };
 
@@ -100,7 +102,7 @@ export default function Header() {
 
   const navItems = [
     { label: "HOME", id: "home-section" },
-    { label: "SALE", id: "sale-page" },
+    // { label: "SALE", id: "sale-page" },
     { label: "SHOP BY TYPE", type: "dropdown" },
     {
       label: "SHOP BY SPACE",
@@ -186,29 +188,28 @@ export default function Header() {
       {!isScrolled && (
         <div className="bg-white text-sm flex justify-center items-center gap-4 px-6 py-2 border-b border-gray-200">
           <a
-  href="tel:+919876543210" // ✅ Replace with your number
-  className="flex items-center gap-1 text-gray-600 hover:text-orange-500 transition-colors"
->
-  <Phone size={16} /> <span>Talk On Call</span>
-</a>
-
-          <span className="text-gray-400">|</span>
-          <div className="flex items-center gap-1 text-green-600 cursor-pointer"
-          onClick={handleWhatsAppClick} // ✅ Added WhatsApp click
+            href="tel:+919876543210"
+            className="flex items-center gap-1 text-gray-600 hover:text-orange-500 transition-colors"
           >
-            
-            <MessageCircle size={16} /> <span>Chat On WhatsApp</span>
+            <Phone size={20} className="font-bold" /> 
+            <span className="font-bold">Talk On Call</span>
+          </a>
+          <span className="text-gray-800">||</span>
+          <div
+            className="flex items-center gap-1 text-green-500 cursor-pointer"
+            onClick={handleWhatsAppClick}
+          >
+            <SiWhatsapp size={20} className="font-bold" /> <span>Chat On WhatsApp</span>
           </div>
         </div>
       )}
 
       {!isScrolled && (
-        <div className="bg-black text-yellow-400 text-center text-xs py-2">
+        <div className="bg-black text-yellow-400 text-center font-bold text-xs py-3">
           WELCOME TO LIGHT CIRCLE
         </div>
       )}
 
-      {/* ✅ Smooth fading background */}
       <div className="relative z-10">
         <div
           className={`absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out`}
@@ -218,19 +219,17 @@ export default function Header() {
           }}
         ></div>
 
-        <div
-          className={`relative z-10 transition duration-500 ${!isScrolled && "bg-transparent"}`}
-        >
+        <div className={`relative z-10 transition duration-500 ${!isScrolled && "bg-transparent"}`}>
           <nav className="relative flex justify-between items-center px-6 max-w-7xl mx-auto">
             <div
               className="flex-shrink-0 cursor-pointer"
               onClick={() => handleScrollTo("home-section")}
             >
-              <Image src="/images/logo.png" alt="Logo" width={150} height={150} />
+              <Image src="/images/logo.png" alt="Logo" width={180} height={180} />
             </div>
 
             <div className="hidden md:flex absolute left-1/2 -translate-x-1/2">
-              <ul className="flex flex-nowrap gap-5 text-sm font-medium text-black whitespace-nowrap">
+              <ul className="flex flex-nowrap gap-5 text-lg font-medium text-black whitespace-nowrap">
                 {navItems.map((item) => {
                   if (item.label === "SALE") {
                     return (
@@ -239,13 +238,15 @@ export default function Header() {
                         onClick={() => handleScrollTo(item.id)}
                         className="flex items-center space-x-1 cursor-pointer hover:scale-105 transition-transform"
                       >
-                        <span className="text-orange-500">SALE</span>
-                        <span className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">%</span>
+                        <span className="text-orange-500 text-lg">SALE</span>
+                        <span className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">
+                          %
+                        </span>
                       </li>
                     );
                   } else if (item.label === "SHOP BY TYPE") {
                     return (
-                      <li key={item.label} className="cursor-pointer">
+                      <li key={item.label} className="cursor-pointer text-lg">
                         <Dropdown overlay={shopByTypeMenu} placement="bottom" arrow>
                           <span>{item.label}</span>
                         </Dropdown>
@@ -253,7 +254,7 @@ export default function Header() {
                     );
                   } else if (item.label === "SHOP BY SPACE") {
                     return (
-                      <li key={item.label} className="cursor-pointer">
+                      <li key={item.label} className="cursor-pointer text-lg">
                         <Dropdown overlay={shopBySpaceMenu} placement="bottom" arrow>
                           <span>{item.label}</span>
                         </Dropdown>
@@ -264,7 +265,7 @@ export default function Header() {
                       <li
                         key={item.label}
                         onClick={() => handleScrollTo(item.id)}
-                        className="cursor-pointer hover:text-orange-500 transition-colors"
+                        className="cursor-pointer hover:text-orange-500 transition-colors text-lg"
                       >
                         {item.label}
                       </li>
@@ -276,13 +277,16 @@ export default function Header() {
 
             <div className="flex items-center gap-4 text-black">
               <User className="cursor-pointer" onClick={() => router.push("/login")} />
-              <Menu className="block md:hidden cursor-pointer" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
+              <Menu
+                className="block md:hidden cursor-pointer"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              />
             </div>
           </nav>
 
           {mobileMenuOpen && (
             <div className="md:hidden bg-white shadow-md px-6 py-4">
-              <ul className="flex flex-col gap-4">
+              <ul className="flex flex-col gap-4 text-lg">
                 <li className="flex flex-col">
                   <button
                     className="flex items-center justify-between text-black"

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Phone, Mail, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin} from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
 import { saveContactUs } from "./../../service/apiContact";
 
 export default function ContactPage() {
@@ -38,10 +39,10 @@ export default function ContactPage() {
         <span className="font-bold">REACH US ANYTIME ON</span>
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 max-w-4xl w-full">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12 max-w-6xl w-full">
         <div className="flex flex-col items-center text-center">
-          <MessageCircle size={48} className="mb-4 text-black" />
-          <h3 className="font-bold mb-2">WHATSAPP</h3>
+          <SiWhatsapp size={48} className="mb-4 text-black" />
+          <h3 className="font-bold mb-4">WHATSAPP</h3>
           <a
             href="https://wa.me/+918093442657"
             target="_blank"
@@ -66,8 +67,18 @@ export default function ContactPage() {
             href="mailto:lclightings@gmail.com"
             className="underline text-sm text-black"
           >
-            lclightings@gmail.com
+            info@lightcircle.in
           </a>
+        </div>
+
+        <div className="flex flex-col items-center text-center">
+          <MapPin size={48} className="mb-4 text-black" />
+          <h3 className="font-bold mb-2">ADDRESS</h3>
+          <p className="text-sm">
+            Plot no 88, Lane 6, Bapuji Nagar,
+            <br />
+            Bhubaneswar, Odisha 751009
+          </p>
         </div>
       </div>
 
