@@ -4,10 +4,10 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Phone, User, Menu, ChevronDown } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
-
 import { usePathname, useRouter } from "next/navigation";
 import { Dropdown } from "antd";
 import { getCategory } from "@/service/apiCategory";
+import { AnimatePresence, motion } from "framer-motion";
 
 // ✅ Global smooth scrolling
 if (typeof document !== "undefined") {
@@ -24,11 +24,12 @@ export default function Header() {
 
   const router = useRouter();
   const pathname = usePathname();
+
   const handleWhatsAppClick = () => {
-    window.open("https://wa.me/919876543210", "_blank"); // ✅ Change number to your WhatsApp
+    window.open("https://wa.me/919876543210", "_blank"); // ✅ Change number
   };
 
-  // ✅ Smooth background change on scroll
+  // ✅ Scroll listener
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -37,13 +38,13 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ✅ Fetch only categories
+  // ✅ Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await getCategory();
         if (res?.data) {
-          const filtered = res.data.filter((cat) => cat.image); // Keep only those with images
+          const filtered = res.data.filter((cat) => cat.image);
           setCategories(filtered);
         }
       } catch (err) {
@@ -58,9 +59,8 @@ export default function Header() {
     setMobileTypeOpen(false);
     setMobileSpaceOpen(false);
 
-    // ✅ Redirect to home if on another page
     if (id === "home-section" && pathname !== "/") {
-      setIsLoading(true); // Loader before redirect
+      setIsLoading(true);
       router.push("/");
       setTimeout(() => setIsLoading(false), 800);
       return;
@@ -68,9 +68,7 @@ export default function Header() {
 
     if (["home-section", "sale-page", "about-section", "contact-page", "blog-page"].includes(id)) {
       setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 800);
+      setTimeout(() => setIsLoading(false), 800);
     }
 
     if (id === "sale-page") {
@@ -102,7 +100,6 @@ export default function Header() {
 
   const navItems = [
     { label: "HOME", id: "home-section" },
-    // { label: "SALE", id: "sale-page" },
     { label: "SHOP BY TYPE", type: "dropdown" },
     {
       label: "SHOP BY SPACE",
@@ -178,7 +175,6 @@ export default function Header() {
 
   return (
     <header className="w-full fixed top-0 left-0 z-50">
-      {/* FULLSCREEN LOADING SPINNER */}
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
           <div className="w-12 h-12 rounded-full border-t-4 border-b-4 border-orange-500 animate-spin"></div>
@@ -191,7 +187,7 @@ export default function Header() {
             href="tel:+919876543210"
             className="flex items-center gap-1 text-gray-600 hover:text-orange-500 transition-colors"
           >
-            <Phone size={20} className="font-bold" /> 
+            <Phone size={20} className="font-bold" />
             <span className="font-bold">Talk On Call</span>
           </a>
           <span className="text-gray-800">||</span>
@@ -211,23 +207,63 @@ export default function Header() {
       )}
 
       <div className="relative z-10">
+        {/* ✅ Background behind navbar with proper height */}
         <div
-          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out`}
+          className={`absolute top-0 left-0 w-full bg-cover bg-center transition-all duration-700 ease-in-out z-0 ${
+            isScrolled ? "h-[80px]" : "h-[120px]"
+          }`}
           style={{
             backgroundImage: "url('/images/z (2).png')",
             opacity: isScrolled ? 1 : 0,
           }}
         ></div>
 
-        <div className={`relative z-10 transition duration-500 ${!isScrolled && "bg-transparent"}`}>
-          <nav className="relative flex justify-between items-center px-6 max-w-7xl mx-auto">
+        <div className="relative z-10 transition duration-500">
+          {/* ✅ Navbar wrapper fills the same height */}
+          <nav
+            className={`relative flex justify-between items-center px-6 max-w-7xl mx-auto transition-all duration-500 ${
+              isScrolled ? "h-[80px]" : "h-[120px]"
+            }`}
+          >
+            {/* Left side */}
             <div
-              className="flex-shrink-0 cursor-pointer"
+              className="flex-shrink-0 cursor-pointer flex items-center"
               onClick={() => handleScrollTo("home-section")}
             >
-              <Image src="/images/logo.png" alt="Logo" width={180} height={180} />
+              <AnimatePresence mode="wait">
+                {!isScrolled ? (
+                  <motion.div
+                    key="logo"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <Image
+                      src="/images/logo.png"
+                      alt="Logo"
+                      width={150}
+                      height={150}
+                      className="transition-all duration-500"
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.span
+                    key="text"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.4 }}
+                    className="text-2xl font-bold tracking-wide transition-all duration-500"
+                  >
+                    <span className="text-black">LIGHT</span>{" "}
+                    <span className="text-orange-500">CIRCLE</span>
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </div>
 
+            {/* ✅ Desktop Menu */}
             <div className="hidden md:flex absolute left-1/2 -translate-x-1/2">
               <ul className="flex flex-nowrap gap-5 text-lg font-medium text-black whitespace-nowrap">
                 {navItems.map((item) => {
@@ -275,6 +311,7 @@ export default function Header() {
               </ul>
             </div>
 
+            {/* ✅ Right Side */}
             <div className="flex items-center gap-4 text-black">
               <User className="cursor-pointer" onClick={() => router.push("/login")} />
               <Menu
@@ -284,6 +321,7 @@ export default function Header() {
             </div>
           </nav>
 
+          {/* ✅ Mobile Menu (unchanged) */}
           {mobileMenuOpen && (
             <div className="md:hidden bg-white shadow-md px-6 py-4">
               <ul className="flex flex-col gap-4 text-lg">

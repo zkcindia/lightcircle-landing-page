@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
+import { MdLocationOn, MdEmail, MdPhone } from "react-icons/md";
+import { FaWhatsapp } from "react-icons/fa";
 import Image from "next/image";
 
 export default function Footer() {
@@ -21,7 +23,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Logo & Tagline */}
         <div>
-          <h2 className="text-2xl font-bold tracking-widest mb-2">LIGHTCICLE</h2>
+          <h2 className="text-2xl font-bold tracking-widest mb-2">LIGHTCIRCLE</h2>
           <p className="text-sm mb-4">Lights for people who love great design</p>
           <div className="flex items-center gap-2 mb-4">
             <Image
@@ -55,13 +57,24 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* About Links */}
+        {/* About Links + Payment Partners */}
         <div>
-          <h3 className="text-sm font-semibold mb-4">MORE ABOUT LIGHTCICLE</h3>
+          <h3 className="text-sm font-semibold mb-4">MORE ABOUT LIGHTCIRCLE</h3>
           <ul className="space-y-2 text-sm">
-            <li><a href="#" className="hover:underline cursor-pointer">About Us</a></li>
-            <li><a href="#" className="hover:underline cursor-pointer">Contact Us</a></li>
+            <li><a href="/aboutus" className="hover:underline cursor-pointer">About Us</a></li>
+            <li><a href="/contact" className="hover:underline cursor-pointer">Contact Us</a></li>
           </ul>
+
+          {/* ✅ Payment Partners moved here */}
+          <div className="mt-6">
+            <h3 className="text-xs font-medium mb-2">PAYMENT PARTNERS</h3>
+            <div className="flex flex-wrap gap-4">
+              <Image src="/images/VISA.png" alt="Visa" width={40} height={24} className="cursor-pointer" />
+              <Image src="/images/mastercard.png" alt="Mastercard" width={40} height={24} className="cursor-pointer" />
+              <Image src="/images/paytm.png" alt="Paytm" width={40} height={24} className="cursor-pointer" />
+              <Image src="/images/gpay.png" alt="Google Pay" width={40} height={24} className="cursor-pointer" />
+            </div>
+          </div>
         </div>
 
         {/* Subscribe */}
@@ -74,7 +87,7 @@ export default function Footer() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full border-b border-gray-400 mb-4 px-2 py-1 focus:outline-none"
           />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mb-6">
             <button
               onClick={handleSubscribe}
               className="border border-gray-700 text-sm px-6 py-2 cursor-pointer rounded-full transition-all duration-300 hover:bg-gray-700 hover:text-white hover:shadow-md hover:scale-105"
@@ -87,14 +100,38 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Payment Partners */}
-        <div>
-          <h3 className="text-sm font-semibold mb-4">PAYMENT PARTNERS</h3>
-          <div className="flex flex-wrap gap-4">
-            <Image src="/images/VISA.png" alt="Visa" width={40} height={24} className="cursor-pointer" />
-            <Image src="/images/mastercard.png" alt="Mastercard" width={40} height={24} className="cursor-pointer" />
-            <Image src="/images/paytm.png" alt="Paytm" width={40} height={24} className="cursor-pointer" />
-            <Image src="/images/gpay.png" alt="Google Pay" width={40} height={24} className="cursor-pointer" />
+        {/* ✅ Contact Info */}
+        <div className="space-y-3 text-sm">
+          <div className="flex items-start gap-2">
+            {/* 🔹 Made the Location Icon Bigger */}
+            <MdLocationOn className="text-gray-600 mt-0.5 text-xl" />
+            <p>
+              Plot no 88, Lane 6, Bapuji Nagar,
+              Bhubaneswar, Odisha 751009
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <MdEmail className="text-gray-600" />
+            <a href="mailto:info@lightcircle.in" className="hover:underline">
+              info@lightcircle.in
+            </a>
+          </div>
+          <div className="flex items-center gap-2">
+            <MdPhone className="text-gray-600" />
+            <a href="tel:+91 8093442657" className="hover:underline">
+              +91 8093442657
+            </a>
+          </div>
+          <div className="flex items-center gap-2">
+            <FaWhatsapp className="text-green-600" />
+            <a
+              href="https://wa.me/+91 8093442657"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              Chat With Us
+            </a>
           </div>
         </div>
       </div>
@@ -123,7 +160,7 @@ export default function Footer() {
             <a href="#" className="hover:underline cursor-pointer">Privacy</a>
             <a href="#" className="hover:underline cursor-pointer">Intellectual Property</a>
           </div>
-          <div className="text-xs">&copy; All rights reserved by lightcicle</div>
+          <div className="text-xs">&copy; All rights reserved by lightcircle</div>
         </div>
       </div>
     </footer>

@@ -33,7 +33,7 @@ export default function AboutPage() {
         <p>
           Visit{" "}
           <a href="https://lightcicle.in" className="text-blue-600 underline">
-            lightcicle.in
+            lightcircle.in
           </a>{" "}
           to see our widest range of decorative lights.
         </p>
