@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function BrightenUpYourMonsoonPage() {
   return (
-    <main className="max-w-4xl mx-auto py-16 px-4">
+    <main className="max-w-4xl mx-auto py-49 px-4">
       <div className="mb-8">
         <Image
           src="/images/b1.jpg"

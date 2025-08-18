@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import Image from "next/image";
+import { getReviewHandler } from "../../service/apiGoogle";
 
 // ✅ Demo fallback reviews with custom profile images
 const fallbackReviews = [
@@ -36,28 +37,14 @@ const fallbackReviews = [
   },
 ];
 
-// ✅ Google Reviews fetcher
+// ✅ Google Reviews fetcher (calls your Next.js API route)
 async function getGoogleReviews() {
-  const placeId = "YOUR_PLACE_ID"; // replace with your Place ID
-  const apiKey = "YOUR_API_KEY";   // replace with your Google Maps API key
+  console.log("called");
 
-  const res = await fetch(
-    `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,reviews&key=${apiKey}`
-  );
+  const res = await getReviewHandler();
   if (!res.ok) throw new Error("Failed to fetch reviews");
-
   const data = await res.json();
-
-  return (
-    data.result?.reviews?.map((r, i) => ({
-      name: r.author_name,
-      time: r.relative_time_description,
-      text: r.text,
-      stars: r.rating,
-      // ✅ If Google doesn’t give a photo, fallback to demo images
-      profile: r.profile_photo_url || `/images/reviews/user${(i % 4) + 1}.jpg`,
-    })) || []
-  );
+  return data.reviews;
 }
 
 export default function ReviewScroller() {
@@ -78,7 +65,12 @@ export default function ReviewScroller() {
   }, []);
 
   return (
-    <div className="overflow-hidden w-full bg-gray-50 py-6">
+    <div className="overflow-hidden w-full bg-gray-100 py-6">
+      {/* ✅ Added Heading */}
+      <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">
+        HAPPY CUSTOMERS
+      </h2>
+
       <div className="flex animate-marquee gap-6">
         {reviews.concat(reviews).map((review, index) => (
           <div
@@ -124,10 +116,10 @@ export default function ReviewScroller() {
         }
         @keyframes marquee {
           from {
-            transform: translateX(0);
+            transform: translateX(-50%);
           }
           to {
-            transform: translateX(-50%);
+            transform: translateX(0);
           }
         }
       `}</style>

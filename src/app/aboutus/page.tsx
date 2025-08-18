@@ -5,7 +5,7 @@ import { Quote } from "lucide-react"; // Optional: use an icon if you want
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen flex flex-col justify-center items-center bg-white px-4 py-20 text-center text-gray-700 pt-72">
+    <main className="min-h-screen flex flex-col justify-center items-center bg-white px-4 py-20 text-center text-gray-700 pt-52">
       <h2 className="text-3xl font-light mb-6">
         <span className="font-bold text-black">ABOUT US</span>
       </h2>

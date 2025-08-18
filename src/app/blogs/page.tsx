@@ -80,7 +80,7 @@ const blogPosts = [
 
 export default function BlogPage() {
   return (
-    <main className="flex flex-col items-center py-16 px-4">
+    <main className="flex flex-col items-center py-45 px-4">
       {/* Blog Category Title */}
       <h1 className="text-2xl md:text-3xl font-semibold mb-8 uppercase tracking-wider">
         General

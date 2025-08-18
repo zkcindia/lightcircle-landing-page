@@ -34,7 +34,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col justify-center items-center bg-white px-4 py-20 text-black pt-60">
+    <main className="min-h-screen flex flex-col justify-center items-center bg-white px-4 py-20 text-black pt-55">
       <h2 className="text-xl md:text-2xl mb-8 text-center font-light">
         <span className="font-bold">REACH US ANYTIME ON</span>
       </h2>
@@ -64,7 +64,7 @@ export default function ContactPage() {
           <Mail size={48} className="mb-4 text-black" />
           <h3 className="font-bold mb-2">MAIL</h3>
           <a
-            href="mailto:lclightings@gmail.com"
+            href="mailto:info@lightcircle.in"
             className="underline text-sm text-black"
           >
             info@lightcircle.in
