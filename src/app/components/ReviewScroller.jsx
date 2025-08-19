@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import Image from "next/image";
-import { getReviewHandler } from "../../service/apiGoogle";
+import {getReviewHandler} from './../../service/apiGoogle'
 
-// ✅ Demo fallback reviews with custom profile images
+
 const fallbackReviews = [
   {
     name: "Sk Inzamamul Haque",
@@ -37,36 +37,27 @@ const fallbackReviews = [
   },
 ];
 
-// ✅ Google Reviews fetcher (calls your Next.js API route)
-async function getGoogleReviews() {
-  console.log("called");
-
-  const res = await getReviewHandler();
-  if (!res.ok) throw new Error("Failed to fetch reviews");
-  const data = await res.json();
-  return data.reviews;
-}
-
 export default function ReviewScroller() {
   const [reviews, setReviews] = useState(fallbackReviews);
 
-  useEffect(() => {
-    async function fetchReviews() {
-      try {
-        const googleReviews = await getGoogleReviews();
-        if (googleReviews.length > 0) {
-          setReviews(googleReviews);
-        }
-      } catch (err) {
-        console.warn("Using fallback reviews:", err.message);
+ useEffect(() => {
+  async function fetchReviews() {
+    try {
+      const googleReviews = await getReviewHandler();
+      if (googleReviews.length > 0) {
+        setReviews(googleReviews);
       }
+    } catch (err) {
+      console.warn("Using fallback reviews:", err.message);
     }
-    fetchReviews();
-  }, []);
+  }
+  fetchReviews();
+}, []);
+
+
 
   return (
     <div className="overflow-hidden w-full bg-gray-100 py-6">
-      {/* ✅ Added Heading */}
       <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">
         HAPPY CUSTOMERS
       </h2>
@@ -107,7 +98,6 @@ export default function ReviewScroller() {
         ))}
       </div>
 
-      {/* CSS for marquee effect */}
       <style jsx>{`
         .animate-marquee {
           display: flex;
